@@ -1,0 +1,7 @@
+*.b#*
+*.s#*
+gerber/
+.DS_Store
+partslist*
+*farnell*
+*.csv
