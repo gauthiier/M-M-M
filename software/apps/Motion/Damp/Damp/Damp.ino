@@ -11,7 +11,7 @@ void setup(){
 
 void loop(){
   x = analogRead(A0);
-  v = x - xold; //lag v, too
+  v = x - xold; //lag v, too?
   xold += 0.1*(x-xold); //slide xold with lag
   
   if(c++==0){
