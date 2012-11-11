@@ -33,6 +33,8 @@ prog_uint16_t hertsTable[] PROGMEM = {8,8,9,9,10,10,11,12,12,13,14,15,16,17,18,1
 
 prog_uint32_t envTimeTable[] PROGMEM = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,33,34,35,36,37,38,39,41,42,43,45,46,48,49,51,53,55,57,59,61,63,65,67,70,73,75,78,81,85,88,92,96,100,104,109,114,119,125,131,138,146,154,163,172,183,195,209,225,242,261,284,310,341,379,425,482,556,654,792,998,1342,2030,4095};
 
+float semitoneTable[] = {0.25,0.2648658,0.2806155,0.29730177,0.31498027,0.33370996,0.35355338,0.37457678,0.39685026,0.4204482,0.44544938,0.47193715,0.5,0.5297315,0.561231,0.59460354,0.62996054,0.6674199,0.70710677,0.74915355,0.7937005,0.8408964,0.8908987,0.9438743,1.0,1.0594631,1.122462,1.1892071,1.2599211,1.3348398,1.4142135,1.4983071,1.587401,1.6817929,1.7817974,1.8877486,2.0,2.1189263,2.244924,2.3784142,2.5198421,2.6696796,2.828427,2.9966142,3.174802,3.3635857,3.563595,3.7754972,4.0};
+
 MMusic Music;
 
 // Defining which pins the SPI interface is connected to.
@@ -83,10 +85,14 @@ void MMusic::init()
 	PORTD |= (1<<6);
 	
 	// waveform setup
-	setSine();
+	//setSine();
+	setWaveform(0);
 	
 	// frequency setup
-	setFrequency(110);
+	setFrequency(440);
+	setSemitone1(0);
+	setSemitone2(0);
+	setSemitone3(0);
 	setDetune(0);
 	
 	// gain setup
@@ -122,9 +128,9 @@ void MMusic::init()
 
 void MMusic::setFrequency(float freq)
 {
-	period1 = uint16_t((freq * 65536.0) / SAMPLE_RATE);
-	period2 = uint16_t(((freq * (1 + detune2)) * 65536.0) / SAMPLE_RATE);
-	period3 = uint16_t(((freq * (1 + detune3)) * 65536.0) / SAMPLE_RATE);
+	period1 = uint16_t(((freq * semi1 * (1 + detune1 + bend)) * 65536.0) / SAMPLE_RATE);
+	period2 = uint16_t(((freq * semi2 * (1 + detune2 + bend)) * 65536.0) / SAMPLE_RATE);
+	period3 = uint16_t(((freq * semi3 * (1 + detune3 + bend)) * 65536.0) / SAMPLE_RATE);
 	frequency = freq;
 	frequency1 = freq;
 	frequency2 = freq;
@@ -134,45 +140,101 @@ void MMusic::setFrequency(float freq)
 
 void MMusic::setFrequency1(float freq)
 {
-	period1 = uint16_t((freq * 65536.0) / SAMPLE_RATE);
 	frequency1 = freq;
+	period1 = uint16_t(((frequency1 * semi1 * (1 + detune1 + bend)) * 65536.0) / SAMPLE_RATE);
 }
 
 
 void MMusic::setFrequency2(float freq)
 {
-	period2 = uint16_t(((freq * (1 + detune2)) * 65536.0) / SAMPLE_RATE);
 	frequency2 = freq;
+	period2 = uint16_t(((frequency2 * semi2 * (1 + detune2 + bend)) * 65536.0) / SAMPLE_RATE);
 }
 
 
 void MMusic::setFrequency3(float freq)
 {
-	period3 = uint16_t(((freq * (1 + detune3)) * 65536.0) / SAMPLE_RATE);
 	frequency3 = freq;
+	period3 = uint16_t(((frequency3 * semi3 * (1 + detune3 + bend)) * 65536.0) / SAMPLE_RATE);
+}
+
+
+void MMusic::setSemitone1(int8_t semi)
+{
+	if(-25 < semi && semi < 25){
+		semi1 = semitoneTable[semi+24];
+	} else if (semi < -24) {
+		semi1 = semitoneTable[0];
+	} else {
+		semi1 = semitoneTable[48];
+	}
+	period1 = uint16_t(((frequency1 * semi1 * (1 + detune1 + bend)) * 65536.0) / SAMPLE_RATE);
+}
+
+
+void MMusic::setSemitone2(int8_t semi)
+{
+	if(-25 < semi && semi < 25){
+		semi2 = semitoneTable[semi+24];
+	} else if (semi < -24) {
+		semi2 = semitoneTable[0];
+	} else {
+		semi2 = semitoneTable[48];
+	}
+	period2 = uint16_t(((frequency2 * semi2 * (1 + detune2 + bend)) * 65536.0) / SAMPLE_RATE);
+}
+
+
+void MMusic::setSemitone3(int8_t semi)
+{
+	if(-25 < semi && semi < 25){
+		semi3 = semitoneTable[semi+24];
+	} else if (semi < -24) {
+		semi3 = semitoneTable[0];
+	} else {
+		semi3 = semitoneTable[48];
+	}
+	period3 = uint16_t(((frequency3 * semi3 * (1 + detune3 + bend)) * 65536.0) / SAMPLE_RATE);
 }
 
 
 void MMusic::setDetune(float detune)
 {
+	detune1 = 0.0;
 	detune2 = detune;
 	detune3 = -detune;
-	period2 = uint16_t(((frequency2 * (1 + detune2)) * 65536.0) / SAMPLE_RATE);
-	period3 = uint16_t(((frequency3 * (1 + detune3)) * 65536.0) / SAMPLE_RATE);
+	period2 = uint16_t(((frequency2 * semi2 * (1 + detune2 + bend)) * 65536.0) / SAMPLE_RATE);
+	period3 = uint16_t(((frequency3 * semi3 * (1 + detune3 + bend)) * 65536.0) / SAMPLE_RATE);
+}
+
+
+void MMusic::setDetune1(float detune)
+{
+	detune1 = detune;
+	period1 = uint16_t(((frequency1 * semi1 * (1 + detune1 + bend)) * 65536.0) / SAMPLE_RATE);
 }
 
 
 void MMusic::setDetune2(float detune)
 {
 	detune2 = detune;
-	period2 = uint16_t(((frequency2 * (1 + detune2)) * 65536.0) / SAMPLE_RATE);
+	period2 = uint16_t(((frequency2 * semi2 * (1 + detune2 + bend)) * 65536.0) / SAMPLE_RATE);
 }
 
 
 void MMusic::setDetune3(float detune)
 {
 	detune3 = detune;
-	period3 = uint16_t(((frequency3 * (1 + detune3)) * 65536.0) / SAMPLE_RATE);
+	period3 = uint16_t(((frequency3 * semi3 * (1 + detune3 + bend)) * 65536.0) / SAMPLE_RATE);
+}
+
+
+void MMusic::pitchBend(float b)
+{
+	bend = b;
+	period1 = uint16_t(((frequency1 * semi1 * (1 + detune1 + bend)) * 65536.0) / SAMPLE_RATE);
+	period2 = uint16_t(((frequency2 * semi2 * (1 + detune2 + bend)) * 65536.0) / SAMPLE_RATE);
+	period3 = uint16_t(((frequency3 * semi3 * (1 + detune3 + bend)) * 65536.0) / SAMPLE_RATE);	
 }
 
 
@@ -180,35 +242,34 @@ void MMusic::setDetune3(float detune)
 
 /////////////////////////////////////
 //
-//	OVERALL GAIN FUNCTIONS
+//	WAVEFORM FUNCTIONS
 //
 /////////////////////////////////////
 
 
-void MMusic::setSine() 
+void MMusic::setWaveform(uint16_t waveForm)
 {
-	sine = true;
-	saw = false;
-	square = false;
-	waveForm = 0;
+	waveForm1 = waveForm * 256;
+	waveForm2 = waveForm * 256;
+	waveForm3 = waveForm * 256;
 }
 
 
-void MMusic::setSaw()
+void MMusic::setWaveform1(uint16_t waveForm)
 {
-	sine = false;
-	saw = true;
-	square = false;
-	waveForm = 1;
+	waveForm1 = waveForm * 256;
 }
 
 
-void MMusic::setSquare()
+void MMusic::setWaveform2(uint16_t waveForm)
 {
-	sine = false;
-	saw = false;
-	square = true;
-	waveForm = 2;
+	waveForm2 = waveForm * 256;
+}
+
+
+void MMusic::setWaveform3(uint16_t waveForm)
+{
+	waveForm3 = waveForm * 256;
 }
 
 
@@ -438,6 +499,12 @@ void MMusic::setVelSustain(uint8_t vel)
 }
 
 
+void MMusic::setVelPeak(uint8_t vel)
+{
+	velPeak = vel * (MAX_ENV_GAIN / 128);	
+}
+
+
 
 
 /////////////////////////////////////
@@ -447,7 +514,7 @@ void MMusic::setVelSustain(uint8_t vel)
 /////////////////////////////////////
 
 
-void MMusic::synthInterrupt()
+void inline MMusic::synthInterrupt()
 {
 	// Frame sync low for SPI (making it low here so that we can measure lenght of interrupt with scope)
 	PORTD &= ~(1<<6);
@@ -461,63 +528,44 @@ void MMusic::synthInterrupt()
 	accumulator3 = accumulator3 + period3;
 
 	// To use the accumulator position to find the right index in the 
-	// waveform look-up table, we truncate it to 12bit.
-	index1 = accumulator1 >> 4;
-	index2 = accumulator2 >> 4;
-	index3 = accumulator3 >> 4;
+	// waveform look-up table, we truncate it to 8bit.
+	index1 = accumulator1 >> 8;
+	index2 = accumulator2 >> 8;
+	index3 = accumulator3 >> 8;
 	
-	// SINE WAVE
-	// Because the waveform look-up table resides in program memory
-	// we most use memcpy_P to copy the data from that table to our
-	// oscilator variable.
-	if(sine) {
-		memcpy_P(&oscil1, &sineTable[index1],2);
-		memcpy_P(&oscil2, &sineTable[index2],2);
-		memcpy_P(&oscil3, &sineTable[index3],2);
-	}
+	oscil1 = 0;
+	oscil2 = 0;
+	oscil3 = 0;
+		
+	memcpy_P(&oscil1, &waveTable[index1 + waveForm1],1);
+	memcpy_P(&oscil2, &waveTable[index2 + waveForm2],1);
+	memcpy_P(&oscil3, &waveTable[index3 + waveForm3],1);
 
-	// SAWTOOTH WAVE
-	// Just using the index for the oscillator produces a sawtooth shaped waveform
-	else if(saw) {
-		oscil1 = index1;
-		oscil2 = index2;
-		oscil3 = index3;
-	}
 	
-	// SQUARE WAVE
-	else if(square) {
-		oscil1 = index1;
-		oscil2 = index2;
-		oscil3 = index3;
-		oscil1 &= 0x0800;
-		oscil1 ^= 0x0100;
-		oscil2 &= 0x0800;
-		oscil2 ^= 0x0100;
-		oscil3 &= 0x0800;
-		oscil3 ^= 0x0100;
-	}
 	
 	// The DAC formatting routine below assumes the sample to be transmitted
 	// is in the higher 12 bits of the 2 byte variable, so we shift the 
-	// sample up 2 bits each which adds up to 4 bits.
+	// sample up 6 bits each which adds up to 4 bits.
 	// The individual gains for each oscillator is added.
-	sample = (oscil1 * gain1) << 2; 
-	sample += (oscil2 * gain2) << 2; 
-	sample += (oscil3 * gain3) << 2; 
-	sample >>= 16;
+	sample = (oscil1 * gain1); 
+	sample += (oscil2 * gain2); 
+	sample += (oscil3 * gain3); 
+	sample >>= 10;
 	
 
 	// AMPLIFICATION ENVELOPE
 	// Amplification envelope is calculated here
 	if(envelopeOn) {
 		
+		// Attack
 		if(envStage == 1) {
 			env += attack;
-			if(MAX_ENV_GAIN < env) {
-				env = MAX_ENV_GAIN;
+			if(velPeak < env) {
+				env = velPeak;
 				envStage = 2;
 			}
 		}
+		// Decay
 		else if(envStage == 2) {
 			env -= decay;
 			if(env < velSustain || MAX_ENV_GAIN < env) {
@@ -525,9 +573,12 @@ void MMusic::synthInterrupt()
 				envStage = 3;
 			}
 		}
+		// Sustain
 		else if (envStage == 3) {
 			env = velSustain;
 		}
+		
+		// Release
 		else if (envStage == 4) {
 			env -= release;
 			if(MAX_ENV_GAIN < env) {
@@ -535,6 +586,8 @@ void MMusic::synthInterrupt()
 				envStage = 0;
 			}
 		}
+		
+		// No gain
 		else if (envStage == 0) {
 			env = 0;
 			accumulator1 = 0;

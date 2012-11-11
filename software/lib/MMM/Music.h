@@ -45,14 +45,20 @@ public:
 	void setFrequency1(float frequency1);
 	void setFrequency2(float frequency2);
 	void setFrequency3(float frequency3);
+	void setSemitone1(int8_t semi);
+	void setSemitone2(int8_t semi);
+	void setSemitone3(int8_t semi);
 	void setDetune(float detune);
+	void setDetune1(float detune);
 	void setDetune2(float detune);
 	void setDetune3(float detune);
+	void pitchBend(float b);
 	
 	// WAVEFORM FUNCTIONS
-	void setSine();
-	void setSaw();
-	void setSquare();
+	void setWaveform(uint16_t waveForm);
+	void setWaveform1(uint16_t waveForm);
+	void setWaveform2(uint16_t waveForm);
+	void setWaveform3(uint16_t waveForm);
 	
 	// GAIN FUNCTIONS
 	void setGainFloat(float value); // 0.0 - 1.0
@@ -73,6 +79,7 @@ public:
 	void noteOn(uint8_t note); // 0 - 255
 	void noteOff(uint8_t note); // 0 - 255
 	void noteOff();
+	uint16_t getNoteFrequency(uint8_t note); // 0 - 127
 	
 	// ENVELOPE FUNCTIONS
 	void enableEnvelope();
@@ -89,14 +96,18 @@ public:
 	void setSustain(uint8_t sus); // 0 - 127
 	void setRelease(uint8_t rel); // 0 - 127	
 	
-	void setVelSustain(uint8_t vel); // 0 -255
+	void setVelSustain(uint8_t vel); // 0 - 127
+	void setVelPeak(uint8_t vel); // 0 - 127
 
 	
 	
 private:
 	
 	// WAVEFORM VARIABLES
-	uint8_t waveForm;
+	uint16_t waveForm1;
+	uint16_t waveForm2;
+	uint16_t waveForm3;
+	uint16_t waveForm;
 	bool sine;
 	bool saw;
 	bool square;
@@ -110,8 +121,13 @@ private:
 	float frequency1;
 	float frequency2;
 	float frequency3;
+	float semi1;
+	float semi2;
+	float semi3;
+	float detune1;
 	float detune2;
 	float detune3;
+	float bend;
 	
 	// OSCILLATOR VARIABLES
 	uint16_t accumulator1;
@@ -138,6 +154,7 @@ private:
 	uint16_t sustain;
 	uint16_t release;
 	uint16_t velSustain;
+	uint16_t velPeak;
 	
 	// NOTE VARIABLE
 	uint8_t notePlayed;

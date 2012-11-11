@@ -32,37 +32,44 @@ prog_uint16_t hertzTable[] PROGMEM = {8,8,9,9,10,10,11,12,12,13,14,15,16,17,18,1
 
 MMidi Midi;
 
+bool midiRead = false;
+
+
 void MMidi::init()
 {	
 	Serial.begin(115200);
 
 	midiBufferIndex = 0;
-	//notePlayed = 0;
-
-	
+	midiChannel = 0;
 
 }
-
 
 void MMidi::checkMidi()
 {
 	while(Serial.available() > 0) {
 		
-		midiBuffer[midiBufferIndex] = Serial.read();
-		if(midiBuffer[midiBufferIndex] == 0xFF) {
-			midiHandler();
-			midiBufferIndex = 0;
-		}    
-		else midiBufferIndex++;
+		data = Serial.read();
 		
-	}
-	
+		if(data & 0x80 && (data & 0x0F) == midiChannel) {	// bitmask with 10000000 to see if byte is over 127 (data&0x80)
+			midiBufferIndex = 0;							// and check if the midi channel corresponds to the midiChannel
+			midiRead = true;								// the device is set to listen to.
+		} else if(data & 0x80) {							// Else if the byte is over 127 (but not on the device's
+			midiRead = false;								// midiChannel, don't read this or any following bytes.
+		}
+		
+		if(midiRead) {
+			midiBuffer[midiBufferIndex] = data;
+			midiBufferIndex++;
+			if (midiBufferIndex > 2) {
+				midiHandler();
+			}
+		}
+	}	
 }
 
 
 void MMidi::midiHandler() {
 	
-    //midiTime = millis();
     uint8_t midiChannel = (midiBuffer[0] & 0x0F);
     
 	
@@ -115,37 +122,99 @@ void MMidi::midiHandler() {
 
 void MMidi::noteOff(uint8_t channel, uint8_t note, uint8_t vel) {
 	
-	
 	if(notePlayed == note) {
 		Music.setEnvStage(4);
-		//ampGain = 0;
-		//fltGain = 0;      
 	}
-    
 }
 
 
 void MMidi::noteOn(uint8_t channel, uint8_t note, uint8_t vel) {
 	
 	Music.setEnvStage(1);
-	//ampGain = 2 * vel << 8;
-	//fltGain = 2 * vel << 8;
 	Music.setVelSustain(vel);
+	Music.setVelPeak(vel);
 	notePlayed = note;
 	memcpy_P(&frequency, &hertzTable[notePlayed],2);
 	Music.setFrequency1(frequency);
 	Music.setFrequency2(frequency);
-	Music.setFrequency3(frequency);
-	
+	Music.setFrequency3(frequency);	
 }
+
 
 void MMidi::aftertouch(uint8_t channel, uint8_t note, uint8_t pressure) {
 	// Write code here for Aftertouch 
 }
 
+
 void MMidi::controller(uint8_t channel, uint8_t number, uint8_t value) {
 	
 	switch(number) {
+		case DETUNE:
+			Music.setDetune(value/5120.0);
+			break;
+		case PORTAMENTO:
+			//Music.setPortamento(value);  // function to be defined, also argument
+			break;
+		case DETUNE1:
+			Music.setDetune1(value/5120.0);
+			break;
+		case DETUNE2:
+			Music.setDetune2(value/5120.0);
+			break;
+		case DETUNE3:
+			Music.setDetune3(value/5120.0);
+			break;
+		case SEMITONE1:
+			if(15 < value && value < 113) {
+				int8_t val = (((value-16)/2)-24);
+				Music.setSemitone1(val);
+			} else if (value < 16) {
+				Music.setSemitone1(-24);				
+			} else {
+				Music.setSemitone1(24);
+			}
+			break;
+		case SEMITONE2:
+			if(15 < value && value < 113) {
+				int8_t val = (((value-16)/2)-24);
+				Music.setSemitone2(val);
+			} else if (value < 16) {
+				Music.setSemitone2(-24);				
+			} else {
+				Music.setSemitone2(24);
+			}
+			break;
+		case SEMITONE3:
+			if(15 < value && value < 113) {
+				int8_t val = (((value-16)/2)-24);
+				Music.setSemitone3(val);
+			} else if (value < 16) {
+				Music.setSemitone3(-24);				
+			} else {
+				Music.setSemitone3(24);
+			}
+			break;
+		case GAIN1:
+			Music.setGain1(uint16_t(value * 512));
+			break;
+		case GAIN2:
+			Music.setGain2(uint16_t(value * 512));
+			break;
+		case GAIN3:
+			Music.setGain3(uint16_t(value * 512));
+			break;
+		case WAVEFORM:
+			Music.setWaveform(value / 8);
+			break;
+		case WAVEFORM1:
+			Music.setWaveform1(value / 8);
+			break;
+		case WAVEFORM2:
+			Music.setWaveform2(value / 8);
+			break;
+		case WAVEFORM3:
+			Music.setWaveform3(value / 8);
+			break;
 		case ENV_ATTACK:
 			Music.setAttack(value);
 			break;
@@ -158,28 +227,21 @@ void MMidi::controller(uint8_t channel, uint8_t number, uint8_t value) {
 		case ENV_RELEASE:
 			Music.setRelease(value);
 			break;
-		case DETUNE:
-			Music.setDetune(value/5120.0);
-			break;
-		case WAVEFORM:
-			value = value / 43;
-			if(value == 0) Music.setSine();
-			else if(value == 1) Music.setSaw();
-			else if(value == 2) Music.setSquare();
-			break;
 		default:
 			break;
 	} 
-
 }
+
 
 void MMidi::programChange(uint8_t channel, uint8_t number) {
 	// Write code here for Program Change 
 }
 
+
 void MMidi::channelPressure(uint8_t channel, uint8_t pressure) {
 	// Write code here for Channel Pressure 
 }
+
 
 void MMidi::pitchWheel(uint8_t channel, uint8_t highBits, uint8_t lowBits) {
 	// Write code here for Pitch Wheel
