@@ -39,70 +39,36 @@ MMotor MotorB(MOTORB); // this is motor B
 MMotor::MMotor(MOTOR m)
 {
     _m = m;
-    init();
 }
 
 void MMotor::init()
 {    
-    if(!reg_init){
         
-        //PWM, Phase and Frequency
-        //Correctthese modes are preferred for motor control applications p.130
-        TCCR1A = 0;
-        TCCR1B |= (1 << WGM13);
+    if(!reg_init){
         
         //direction pins are outputs
         DDRD |= (1 << PD7);
-        DDRB |= (1 << PB0);
+        DDRB |= (1 << PB0);        
         
+        DDRB |= (1 << PB1) | (1 << PB2);
+        TCCR1A = (1 << COM1A1) | (1 << COM1B1);        
+        
+        // clear the bits
+        TCCR1B &= ~((1 << CS10) | (1 << CS11) | (1 << CS12));
+        TCCR1B = (1 << WGM13) | (1 << CS10);
+        
+        ICR1 = 512;                                                  
         reg_init = true;
     }
     
-    //set period for minimal noise            
-    _period(64);
-    
 }
 
-void MMotor::_set_period_bits()
-{
-    // clear prescaler reg
-    TCCR1B &= ~((1 << CS10) | (1 << CS11) | (1 << CS12));
-    
-    if(_p < RESOLUTION)                  TCCR1B |= (1 << CS10);                  // pre-s 0
-    else if((_p >>= 3) < RESOLUTION)     TCCR1B |= (1 << CS11);                  // pre-s 8
-    else if((_p >>= 3) < RESOLUTION)     TCCR1B |= (1 << CS11) | (1 << CS10);    // pre-s 64
-    else if((_p >>= 2) < RESOLUTION)     TCCR1B |= (1 << CS12);                  // pre-s 256
-    else if((_p >>= 2) < RESOLUTION)     TCCR1B |= (1 << CS12) | (1 << CS10);    // pre-s 1024
-    else _p = RESOLUTION - 1,            TCCR1B |= (1 << CS12) | (1 << CS10);    // pre-s 1024
-    
-    ICR1 = _p;
-    
-}
-
-void MMotor::_period(long ms)
-{
-    _p = (F_CPU * ms) / 2000000;
-    _set_period_bits();
-}
 
 void MMotor::torque(int value) 
-{
-    
-    if(_m == MOTORA) {
-        DDRB |= (1 << PB1);
-        TCCR1A |= (1 << COM1A1);
-    } else if(_m == MOTORB) {
-        DDRB |= (1 << PB2);
-        TCCR1A |= (1 << COM1B1);        
-    }
-    
-    unsigned long duty = _p * value;
-    duty >>= 10;
-    if(_m == MOTORA) OCR1A = duty;
-    else if(_m == MOTORB) OCR1B = duty;    
-    _t = value;    
-    
-    start();
+{            
+    if(_m == MOTORA) OCR1A = value;
+    else if(_m == MOTORB) OCR1B = value;        
+    _t = value;
 }
 
 int MMotor::torque()
@@ -126,7 +92,7 @@ void MMotor::stop()
 
 void MMotor::start()
 {
-    _set_period_bits();
+    TCCR1B = (1 << WGM13) | (1 << CS10);
 }
 
 void MMotor::restart()

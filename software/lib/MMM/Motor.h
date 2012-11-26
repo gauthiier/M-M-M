@@ -21,8 +21,6 @@
  + contact: dviid@labs.ciid.dk 
  */
 
-#include <avr/io.h>
-
 enum MOTOR{
     MOTORA = 0,
     MOTORB = 1
@@ -35,7 +33,7 @@ enum DIRECTION {
 
 class MMotor {    
 
-public:
+public:       
     
     MMotor(MOTOR m);
     
@@ -51,10 +49,7 @@ public:
     void start();
     void restart();
     
-private:
-    
-    void _period(long ms);
-    void _set_period_bits();
+protected:
     
     MOTOR       _m;
     DIRECTION   _d;
