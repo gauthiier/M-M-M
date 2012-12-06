@@ -37,29 +37,29 @@ Motion MotionB(MOTIONA);
 uint8_t lb;
 uint8_t hb;
 int     x, xx; 
-float   T = N * 0.004f; // 4ms
+float   T = N * 0.004f;             // 4ms (see TCNT1)
 float   v;
+
+float MAX_POS = 1023;
+float MAX_VEL = MAX_POS / T;
+float MAX_ACC = MAX_VEL / T;
 
 
 Motion::Motion(MOTION m){
     _m = m;
     _i = false;
+    _fcb = NULL;
 };
 
 void Motion::init(INPUT sensor)
 {        
     if(!motion_reg_init){
-        TCNT1 = 1000; //4 ms 
+        TCNT1 = 1000;               //4 ms (TCNT1)
         TIMSK1 = (1 << TOIE1);
         motion_reg_init = true;    
     }
     _i = true;
     _s = sensor;
-}
-
-void Motion::updatePhysics() 
-{
-    
 }
 
 int Motion::getPosition() {
@@ -72,6 +72,11 @@ float Motion::getVelocity() {
 
 float Motion::getAcceleration() {
     return _a;
+}
+
+void Motion::set_force_callback(force_callback fcb, PHY physics) {
+    _fcb = fcb;
+    _fcb_phy = physics;
 }
 
 

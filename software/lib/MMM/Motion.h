@@ -25,6 +25,8 @@
 
 #define N 10
 
+typedef float (*force_callback)(float position);
+
 enum MOTION {
     MOTIONA = 0,
     MOTIONB = 1
@@ -41,6 +43,12 @@ enum INPUT {
     INPUTA7 = 0x0111    
 };
 
+enum PHY {
+    POSITION = 0,
+    VELOCITY = 1,
+    ACCELERATION = 2
+};
+
 
 class Motion {
     
@@ -53,12 +61,13 @@ public:
     float getVelocity();
     float getAcceleration();
     
-    void updatePhysics();
+    void set_force_callback(force_callback fcb, PHY physics);
     
     
     // raw position vector
     int _xv[N];
     int _ix;    
+    
     int _x;    
     float _v;
     float _a;
@@ -67,6 +76,8 @@ public:
     INPUT  _s;
     bool   _i;
     
+    force_callback _fcb;
+    PHY            _fcb_phy;
 };
 
 extern Motion MotionA;

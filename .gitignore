@@ -1,6 +1,6 @@
 *.b#*
 *.s#*
-gerber/
+gerbers/
 .DS_Store
 partslist*
 *farnell*
