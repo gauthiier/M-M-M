@@ -44,7 +44,7 @@ void loop(){
   vf += ff*tf;
   xf += vf*tf;
   
-  if(c++==0) // when c gets to 255 it next == 0 and send data
+  if(c++==0) // when c gets to 255 it's next == 0 and sends data
   {
     Serial.print(x);
     Serial.print(" ");

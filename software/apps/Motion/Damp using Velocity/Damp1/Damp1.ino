@@ -1,6 +1,6 @@
 //Damp - measure velocity then f=Bv
 #import <Motor.h>
-int x; //position measured
+int x; //position measured - then filtered
 float v, f, t, xold; //velocity, force, time delta
 byte c; //for debug print every 256th loop
 
