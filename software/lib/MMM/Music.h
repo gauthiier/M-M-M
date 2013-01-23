@@ -22,14 +22,28 @@
  */
 
 
+#ifndef Music_h // include guard
+#define Music_h
+
 // current sample rate is 15625 as defined in the init() section
 #define SAMPLE_RATE 15625
 
-// Number of oscillators. Set not higher than 4.
-#define NUM_OSCILLATORS 2
+#define NUM_OSCILLATORS 1
+
+#ifndef NUM_OSCILLATORS
+	#error NUM_OSCILLATORS should be defined in the Music.h file in the libraries folder.
+#elif (NUM_OSCILLATORS == 1)||(NUM_OSCILLATORS == 2)||(NUM_OSCILLATORS == 3)
+#else
+	#error NUM_OSCILLATORS shall be 1, 2 or 3
+#endif
 
 // Maximum possible value for amplification envelope
 #define MAX_ENV_GAIN 65535
+
+#include "Arduino.h"
+#include <avr/interrupt.h>
+#include <avr/pgmspace.h> 
+#include <hardwareSerial.h>
 
 class MMusic {    
 public:
@@ -38,7 +52,8 @@ public:
     void init();
 
 	// AUDIO INTERRUPT SERVICE ROUTINE
-	void synthInterrupt();
+	void synthInterrupt8bit();
+	void synthInterrupt12bitSine();
 		
 	// FREQUENCY AND DETUNE FUNCTIONS
 	void setFrequency(float frequency);
@@ -169,3 +184,5 @@ private:
 };
 
 extern MMusic Music;
+
+#endif // close guard

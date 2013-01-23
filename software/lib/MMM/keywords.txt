@@ -1,0 +1,28 @@
+#######################################
+# Syntax Coloring Map For MMM Library
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Music	KEYWORD1
+Midi	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+init		KEYWORD2
+checkMidi	KEYWORD2
+enableEnvelope	KEYWORD2
+diableEnvelope	KEYWORD2
+setDetune	KEYWORD2
+
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+NUM_OSCILLATORS	LITERAL1

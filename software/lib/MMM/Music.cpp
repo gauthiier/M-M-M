@@ -21,12 +21,8 @@
  + contact: j.bak@ciid.dk
  */
 
-#include <avr/interrupt.h>
-#include <avr/pgmspace.h> 
-
-#include <Wavetable.h>
-#include <Music.h>
-#include <hardwareSerial.h>
+#include "Music.h"
+#include "Wavetable.h"
 
 // Table of MIDI note values to frequency in Hertz
 prog_uint16_t hertsTable[] PROGMEM = {8,8,9,9,10,10,11,12,12,13,14,15,16,17,18,19,20,21,23,24,25,27,29,30,32,34,36,38,41,43,46,48,51,54,58,61,65,69,73,77,82,87,92,97,103,109,116,123,130,138,146,155,164,174,184,195,207,219,233,246,261,277,293,311,329,349,369,391,415,440,466,493,523,554,587,622,659,698,739,783,830,880,932,987,1046,1108,1174,1244,1318,1396,1479,1567,1661,1760,1864,1975,2093,2217,2349,2489,2637,2793,2959,3135,3322,3520,3729,3951,4186,4434,4698,4978,5274,5587,5919,6271,6644,7040,7458,7902,8372,8869,9397,9956,10548,11175,11839,12543};
@@ -46,7 +42,9 @@ ISR(TIMER2_COMPA_vect) {
 	
 	OCR2A = 127;
 	
-	Music.synthInterrupt();
+//	Music.synthInterrupt8bit();
+	
+	Music.synthInterrupt12bitSine();
 	
 }
 
@@ -378,7 +376,8 @@ uint16_t MMusic::getGain()
 void MMusic::noteOn(uint8_t note, uint8_t vel)
 {	
 	envStage = 1;
-	velSustain = vel;
+	setVelSustain(vel);
+	setVelPeak(vel);
 	notePlayed = note;
 	memcpy_P(&frequency16bit, &hertsTable[notePlayed],2);
 	setFrequency1(frequency16bit);
@@ -390,7 +389,8 @@ void MMusic::noteOn(uint8_t note, uint8_t vel)
 void MMusic::noteOn(uint8_t note)
 {	
 	envStage = 1;
-	velSustain = 127;
+	setVelSustain(127);
+	setVelPeak(127);
 	notePlayed = note;
 	memcpy_P(&frequency16bit, &hertsTable[notePlayed],2);
 	setFrequency1(frequency16bit);
@@ -507,49 +507,43 @@ void MMusic::setVelPeak(uint8_t vel)
 
 
 
-/////////////////////////////////////
+/////////////////////////////////////////////////////////
 //
-//	AUDIO INTERRUPT SERVICE ROUTINE
+//	8 BIT WAVETABLE - AUDIO INTERRUPT SERVICE ROUTINE
 //
-/////////////////////////////////////
+/////////////////////////////////////////////////////////
 
 
-void inline MMusic::synthInterrupt()
+void inline MMusic::synthInterrupt8bit()
 {
 	// Frame sync low for SPI (making it low here so that we can measure lenght of interrupt with scope)
 	PORTD &= ~(1<<6);
-	
-	// The accumulator (16bit) keeps track of the pitch by adding the 
-	// the amount of "index" points that the frequency has "travelled" 
-	// since the last sample was sent to the DAC, i.e. the current phase
-	// of the waveform.
+
 	accumulator1 = accumulator1 + period1;
-	accumulator2 = accumulator2 + period2;
-	accumulator3 = accumulator3 + period3;
-
-	// To use the accumulator position to find the right index in the 
-	// waveform look-up table, we truncate it to 8bit.
 	index1 = accumulator1 >> 8;
-	index2 = accumulator2 >> 8;
-	index3 = accumulator3 >> 8;
-	
-	oscil1 = 0;
-	oscil2 = 0;
-	oscil3 = 0;
-		
+	//oscil1 = 0;
 	memcpy_P(&oscil1, &waveTable[index1 + waveForm1],1);
+	sample = (oscil1 * gain1);
+	
+#if(NUM_OSCILLATORS==2 || NUM_OSCILLATORS==3)
+	
+	accumulator2 = accumulator2 + period2;
+	index2 = accumulator2 >> 8;
+	//oscil2 = 0;
 	memcpy_P(&oscil2, &waveTable[index2 + waveForm2],1);
+	sample += (oscil2 * gain2);
+	
+#endif	
+#if NUM_OSCILLATORS==3
+	
+	accumulator3 = accumulator3 + period3;
+	index3 = accumulator3 >> 8;
+	//oscil3 = 0;
 	memcpy_P(&oscil3, &waveTable[index3 + waveForm3],1);
-
-	
-	
-	// The DAC formatting routine below assumes the sample to be transmitted
-	// is in the higher 12 bits of the 2 byte variable, so we shift the 
-	// sample up 6 bits each which adds up to 4 bits.
-	// The individual gains for each oscillator is added.
-	sample = (oscil1 * gain1); 
-	sample += (oscil2 * gain2); 
 	sample += (oscil3 * gain3); 
+
+#endif
+	
 	sample >>= 10;
 	
 
@@ -621,3 +615,114 @@ void inline MMusic::synthInterrupt()
 	PORTD |= (1<<6);
 	
 }
+
+
+
+
+/////////////////////////////////////////////////////////
+//
+//	12 BIT SINEWAVE - AUDIO INTERRUPT SERVICE ROUTINE
+//
+/////////////////////////////////////////////////////////
+
+
+void MMusic::synthInterrupt12bitSine()
+{
+	// Frame sync low for SPI (making it low here so that we can measure lenght of interrupt with scope)
+	PORTD &= ~(1<<6);
+	
+	accumulator1 = accumulator1 + period1;
+	index1 = accumulator1 >> 4;
+	memcpy_P(&oscil1, &sineTable[index1],2);
+	sample = (oscil1 * gain1) << 2; 
+
+#if(NUM_OSCILLATORS==2 || NUM_OSCILLATORS==3)
+
+	accumulator2 = accumulator2 + period2;
+	index2 = accumulator2 >> 4;
+	memcpy_P(&oscil2, &sineTable[index2],2);
+	sample += (oscil2 * gain2) << 2; 
+
+#endif	
+#if NUM_OSCILLATORS==3
+
+	accumulator3 = accumulator3 + period3;	
+	index3 = accumulator3 >> 4;	
+	memcpy_P(&oscil3, &sineTable[index3],2);
+	sample += (oscil3 * gain3) << 2; 
+	
+#endif
+	
+	sample >>= 16;
+	
+	
+	// AMPLIFICATION ENVELOPE
+	// Amplification envelope is calculated here
+	if(envelopeOn) {
+		
+		// Attack
+		if(envStage == 1) {
+			env += attack;
+			if(velPeak < env) {
+				env = velPeak;
+				envStage = 2;
+			}
+		}
+		// Decay
+		else if(envStage == 2) {
+			env -= decay;
+			if(env < velSustain || MAX_ENV_GAIN < env) {
+				env = velSustain;
+				envStage = 3;
+			}
+		}
+		// Sustain
+		else if (envStage == 3) {
+			env = velSustain;
+		}
+		
+		// Release
+		else if (envStage == 4) {
+			env -= release;
+			if(MAX_ENV_GAIN < env) {
+				env = 0;
+				envStage = 0;
+			}
+		}
+		/*		 
+		 // No gain
+		 else if (envStage == 0) {
+		 env = 0;
+		 //accumulator1 = 0;
+		 //accumulator2 = 0;
+		 //accumulator3 = 0;
+		 }
+		 */		 
+	} else {
+		env = 65535;
+	}
+	
+	// Adding the amplification envelope (16bit) we bring it back to the 16bit frame again afterwards.
+	sample = (env * sample) >> 16;
+ 	
+	// Formatting the samples to be transfered to the MCP4921 DAC  
+	dacSPI0 = sample >> 8;
+	dacSPI0 >>= 4;
+	dacSPI0 |= 0x30;
+	dacSPI1 = sample >> 4;
+	
+	SPCR |= (1 << MSTR);
+	
+	// transmit value out the SPI port
+	SPDR = dacSPI0;
+	while (!(SPSR & (1<<SPIF)));  // Maybe this can be optimised
+	SPDR = dacSPI1;
+	while (!(SPSR & (1<<SPIF)));  // Maybe this can be optimised
+	
+	// Frame sync high
+	PORTD |= (1<<6);
+	
+}
+
+
+
