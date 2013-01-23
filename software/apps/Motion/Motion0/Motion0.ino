@@ -1,4 +1,5 @@
 #include <Motion.h>
+#include <Motor.h>
 
 /*
 
@@ -41,15 +42,30 @@ float getAcceleration();
 
 void setup() {
   MotionA.init(INPUTA0);
+  MotorA.init();
   Serial.begin(9600);
+  
+  MotionA.k = 0.2f;
+  MotionA.m = 0.3f;
+  MotionA.d = 0.02f;
+  
 }
 
 void loop() {
+  
+  if(MotionA.F < 0) MotorA.direction(FORWARD);
+  else MotorA.direction(BACKWARD);
+  
+  float t = abs(MotionA.F);
+  MotorA.torque(t);
+  
+  /*
   Serial.print("position: "); Serial.println(MotionA.getPosition());
   Serial.print("velocity: "); Serial.println(MotionA.getVelocity());
   Serial.print("accel: "); Serial.println(MotionA.getAcceleration());
   Serial.println("-------");
   delay(100);
+  */
 }
 
 
