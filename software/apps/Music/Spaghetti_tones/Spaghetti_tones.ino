@@ -24,7 +24,7 @@ void setup() {
   Music.init();
   
   // Choosing the sine wave oscillator (optional since this is already the default).
-  Music.setSine();
+ // Music.setSine(); //Sine is default so don't need this.
   
   // Setting the initial frequency for all three oscillators.
   Music.setFrequency(c);
