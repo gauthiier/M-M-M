@@ -8,20 +8,18 @@
 
 int pos;    // position from analogRead
 int force;  // computed from pos and k
-int k = 1;  // spring constant
+int k = 10;  // spring constant
 int duty;   // pwm duty for Timer1 (range 0 - 1023) 10-bit resolution
  
 void setup() 
 {
-  
-  MotorA.torque(100);  //is this necessary?
-  
+  MotorA.init();
 }
 
 void loop() 
 {
 
-  pos = analogRead(A3);
+  pos = analogRead(A0);
   
   force = k * (512 - pos);
   duty = abs(force);

@@ -36,9 +36,9 @@ Motion MotionB(MOTIONA);
 
 uint8_t lb;
 uint8_t hb;
-int     x, xx; 
+ 
 float   T = N * 0.004f;             // 4ms (see TCNT1)
-float   v;
+int     xin, dx;
 
 float MAX_POS = 1023;
 float MAX_VEL = MAX_POS / T;
@@ -60,18 +60,11 @@ void Motion::init(INPUT sensor)
     }
     _i = true;
     _s = sensor;
-}
-
-int Motion::getPosition() {
-    return _x;
-}
-
-float Motion::getVelocity() {
-    return _v;
-}
-
-float Motion::getAcceleration() {
-    return _a;
+    
+    // initial values
+    d = 0;
+    k = 1;
+    m = 1;
 }
 
 void Motion::set_force_callback(force_callback fcb, PHY physics) {
@@ -84,32 +77,24 @@ void Motion::set_force_callback(force_callback fcb, PHY physics) {
 ISR(TIMER1_OVF_vect) {
     TCNT1 = 1000;     
     
-    
-    
     if(MotionA._i) {
         ADMUX = MotionA._s & 0x07;
         ADCSRA |= (1 << ADSC);
         while (ADCSRA & (1 << ADSC));
         lb = ADCL;
         hb = ADCH;
-        x = (hb << 8) | lb;
-        MotionA._xv[MotionA._ix] = x;
-        MotionA._ix++;
-        MotionA._ix %= N;        
         
-        xx = x - MotionA._x;
-        if(abs(xx) < 2) {            
-            v = 0.0f;
-        } else {
-            v = xx / T;
-        }
+        xin = (hb << 8) | lb;
+        MotionA.Xin =  xin;
         
-        MotionA._a = (v - MotionA._v) / T;        
-        MotionA._v = v;
-        MotionA._x = x;       
+        MotionA.F = MotionA.k * (xin - MotionA.X) - (MotionA.d * MotionA.V);
+        //MotionA.A = MotionA.F / MotionA.m;
+        MotionA.V += (MotionA.F / MotionA.m) * T;
+        MotionA.X += MotionA.V * T;
         
     }
     
+    /*
     if(MotionB._i) {
         ADMUX = MotionB._s & 0x07;
         ADCSRA |= (1 << ADSC);
@@ -134,6 +119,7 @@ ISR(TIMER1_OVF_vect) {
         MotionB._x = x;       
         
     }
+     */
     
 }
 

@@ -14,7 +14,7 @@ int duty;   // pwm duty for Timer1 (range 0 - 1023) 10-bit resolution
 void setup() 
 {
   
-  MotorA.torque(100);  //is this necessary?
+  MotorA.init();
   
 }
 
@@ -25,7 +25,7 @@ void loop()
   
   force = k * (512 - pos);
   duty = abs(force);
-  duty = min(1023, duty);
+  duty = min(512, duty);
   
   MotorA.torque(duty);
   

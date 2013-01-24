@@ -47,17 +47,18 @@ void MMotor::init()
     if(!reg_init){
         
         //direction pins are outputs
-        DDRD |= (1 << PD7);
-        DDRB |= (1 << PB0);        
+        DDRD |= (1 << PD7);        
+        DDRB = (1 << PB0) | (1 << PB1) | (1 << PB2);
         
-        DDRB |= (1 << PB1) | (1 << PB2);
         TCCR1A = (1 << COM1A1) | (1 << COM1B1);        
         
         // clear the bits
         TCCR1B &= ~((1 << CS10) | (1 << CS11) | (1 << CS12));
         TCCR1B = (1 << WGM13) | (1 << CS10);
         
-        ICR1 = 512;                                                  
+        //ICR1 = 512;    
+        ICR1 = 512;    
+        
         reg_init = true;
     }
     

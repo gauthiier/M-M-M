@@ -57,10 +57,6 @@ public:
     
     void init(INPUT sensor);
     
-    int getPosition();
-    float getVelocity();
-    float getAcceleration();
-    
     void set_force_callback(force_callback fcb, PHY physics);
     
     
@@ -68,9 +64,9 @@ public:
     int _xv[N];
     int _ix;    
     
-    int _x;    
-    float _v;
-    float _a;
+    float X, V, A, F;    // from model
+    float m, k, d;    
+    int Xin;            // from the ADC channel specified in Motion constructor (e.g INPUTA0)
         
     MOTION _m;
     INPUT  _s;

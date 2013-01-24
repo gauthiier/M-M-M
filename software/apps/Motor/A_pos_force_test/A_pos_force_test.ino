@@ -3,6 +3,9 @@
 //sends A3 (MotorB), A4 (ForceB)
 // to Serial Monitor
 
+// should FSR set-up be in MMM lib?
+// Bill Verplank 24Jan13
+
 void setup() 
 { 
  Serial.begin(9600);

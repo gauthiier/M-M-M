@@ -1,27 +1,22 @@
 //#include <TimerOne.h>
+//BV 24Jan13
 
 #include <Motor.h>
 
 void setup() 
 {
-
-  MotorA.torque(500);  
+  MotorA.init();
+  MotorA.torque(500);  //512 is max torque
   
 }
 
 void loop() 
 {
-  static int j = 1;
-  static long cnt = 0;
-  
-  if(cnt == 50000) {
-    j = -1;
-    MotorA.direction(FORWARD);
-  } else if(cnt == 0) {
-    j = 1;
-    MotorA.direction(BACKWARD);
-  }
-  cnt += j;  
+
+  MotorA.direction(FORWARD);
+  delay(1000);
+  MotorA.direction(BACKWARD);
+  delay(1000);  
   
 }
   
