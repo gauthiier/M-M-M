@@ -37,10 +37,16 @@ MMusic Music;
 #define SPI_SCK 5
 #define SPI_MOSI 3
 
-// timer 2 is audio interrupt timer
-ISR(TIMER2_COMPA_vect) {
+
+//////////////////////////////////////////////////////////
+//
+// AUDIO INTERRUPT. USE EITHER 8bit or 12bitSine VERSION
+// COMMENT OUT THE ONE YOU ARE NOT USING
+//
+//////////////////////////////////////////////////////////
+ISR(TIMER2_COMPA_vect) { // timer 2 is audio interrupt timer
 	
-	OCR2A = 127;
+	OCR2A = 127; // don't change this
 	
 //	Music.synthInterrupt8bit();
 	

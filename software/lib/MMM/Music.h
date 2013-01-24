@@ -25,13 +25,20 @@
 #ifndef Music_h // include guard
 #define Music_h
 
+////////////////////////////////////
+//
+// SET NUMBER OF OSCILLATORS HERE.
+// SHOULD BE 1, 2 or 3
+//
+////////////////////////////////////
+#define NUM_OSCILLATORS 1
+
+
 // current sample rate is 15625 as defined in the init() section
 #define SAMPLE_RATE 15625
 
-#define NUM_OSCILLATORS 1
-
 #ifndef NUM_OSCILLATORS
-	#error NUM_OSCILLATORS should be defined in the Music.h file in the libraries folder.
+	#error NUM_OSCILLATORS should be defined in the Music.h file in the libraries/MMM folder.
 #elif (NUM_OSCILLATORS == 1)||(NUM_OSCILLATORS == 2)||(NUM_OSCILLATORS == 3)
 #else
 	#error NUM_OSCILLATORS shall be 1, 2 or 3
