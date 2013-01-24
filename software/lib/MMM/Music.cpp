@@ -66,7 +66,7 @@ ISR(TIMER2_COMPA_vect) { // timer 2 is audio interrupt timer
 void MMusic::init()
 {
 	// clear interrupts. to make sure the interrupt timer doesn't start until we've set it up.
-	cli();
+	//cli();
 	
 	// set up syntheziser
 	// this is the timer 2 audio rate timer, fires an interrupt at 15625 Hz sampling rate
@@ -77,9 +77,9 @@ void MMusic::init()
 	
 	// OUTPUTS
 	// sck + mosi + ss
-	DDRB = (1 << DDB2) | (1 << DDB3) | (1 << DDB5);
+	DDRB |= (1 << DDB2) | (1 << DDB3) | (1 << DDB5);
 	// dac_cs output
-	DDRD = (1 << DDD6);
+	DDRD |= (1 << DDD6) | (1 << DDB3);
 		
 	// set up SPI port
 	SPCR = 0x50;
@@ -116,7 +116,7 @@ void MMusic::init()
 	setRelease(64);
 	setVelSustain(0);
 	
-	sei(); // global interrupt enable 
+	//sei(); // global interrupt enable 
 	
 	Serial.println("MUSIC INITIALIZED!");
 }
@@ -522,6 +522,8 @@ void MMusic::setVelPeak(uint8_t vel)
 
 void inline MMusic::synthInterrupt8bit()
 {
+	PORTD &= ~(1<<3);
+	
 	// Frame sync low for SPI (making it low here so that we can measure lenght of interrupt with scope)
 	PORTD &= ~(1<<6);
 
@@ -728,6 +730,10 @@ void MMusic::synthInterrupt12bitSine()
 	// Frame sync high
 	PORTD |= (1<<6);
 	
+	// Frame sync high
+	PORTD |= (1<<3);
+
+
 }
 
 

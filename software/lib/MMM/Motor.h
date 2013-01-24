@@ -53,8 +53,7 @@ protected:
     
     MOTOR       _m;
     DIRECTION   _d;
-    int         _t;  
-    long        _p;
+    int         _t;	// torque
     
 };
 

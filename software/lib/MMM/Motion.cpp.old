@@ -54,7 +54,7 @@ Motion::Motion(MOTION m){
 void Motion::init(INPUT sensor)
 {        
     if(!motion_reg_init){
-        //TCNT1 = 500;               //4 ms (TCNT1)
+        TCNT1 = 1000;               //4 ms (TCNT1)
         TIMSK1 = (1 << TOIE1);
         motion_reg_init = true;    
     }
@@ -73,28 +73,12 @@ void Motion::set_force_callback(force_callback fcb, PHY physics) {
 }
 
 
-
-float Motion::calculateFAVX(int x_in)
-{
-	F = k * (x_in - X) - (d * V);
-	//MotionA.A = MotionA.F / MotionA.m;
-	V += (F / m) * T;
-	X += V * T;
-	return F;
-}
-
-
-int Motion::getX()
-{
-	return Xin - 512;
-}
-
 // clocked at 4ms period
 ISR(TIMER1_OVF_vect) {
-    //TCNT1 = 500;     
+    TCNT1 = 1000;     
     
     if(MotionA._i) {
-        ADMUX = MotionA._s & 0x07; //setting the lower four bits of ADMUX to INPUT bits and upper four bits to 0000.
+        ADMUX = MotionA._s & 0x07;
         ADCSRA |= (1 << ADSC);
         while (ADCSRA & (1 << ADSC));
         lb = ADCL;
@@ -102,16 +86,14 @@ ISR(TIMER1_OVF_vect) {
         
         xin = (hb << 8) | lb;
         MotionA.Xin =  xin;
-                
+        
+        MotionA.F = MotionA.k * (xin - MotionA.X) - (MotionA.d * MotionA.V);
+        //MotionA.A = MotionA.F / MotionA.m;
+        MotionA.V += (MotionA.F / MotionA.m) * T;
+        MotionA.X += MotionA.V * T;
+        
     }
- 
-}
     
-
-
-
-
-
     /*
     if(MotionB._i) {
         ADMUX = MotionB._s & 0x07;
@@ -140,3 +122,5 @@ ISR(TIMER1_OVF_vect) {
     }
      */
     
+}
+
