@@ -1,11 +1,10 @@
 // "Pendulum" - spring-mass oscillator
-//
+// Spring-Mass oscillator (no damping)
 
 //#include <TimerOne.h>
 #include <Motor.h>
 float dt = .005; //time per cycle
 float m = 4.0; //time constant was .002
-
 float k = 1.0;  // spring constant was .15
 float xf,vf,ff; // floating point versions of pendulum x and v and force
 int x; // input from analogRead();
@@ -18,7 +17,6 @@ byte incomingByte;
 
 void setup() 
 {
-  //Timer1.initialize(64); //64 microsecond period
   MotorA.init(); //initializes Timer1, pinModes
   Serial.begin(9600);
   //initialize position (xf), velocity (vf), force (ff)
@@ -35,8 +33,8 @@ void loop(){
   vf = vf + (ff/m)*dt; // integrate F/m to get velocity
   xf = xf + vf*dt; // integrate velocity to get position
   
-  f = min(ff,512); //Motor has max torque of 512
-  duty = abs(f);
+  duty = abs(ff);
+  duty = min(duty,512); //Motor has max torque of 512
   
   
   MotorA.torque(duty);
