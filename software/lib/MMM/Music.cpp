@@ -48,9 +48,9 @@ ISR(TIMER2_COMPA_vect) { // timer 2 is audio interrupt timer
 	
 	OCR2A = 127; // don't change this
 	
-//	Music.synthInterrupt8bit();
+	Music.synthInterrupt8bit();
 	
-	Music.synthInterrupt12bitSine();
+//	Music.synthInterrupt12bitSine();
 	
 }
 
