@@ -7,14 +7,15 @@
 #include "Motor.h"
 #include "Music.h"
 
-int pos;    // position from analogRead
-int force;  // computed from pos and k
-int k = 2;  // spring constant
-int duty;   // pwm duty for Timer1 (range 0 - 1023) 10-bit resolution
+int posA, posB;    // position from analogRead
+int forceA, forceB;  // computed from pos and k
+int kA, kB = 2;  // spring constant
+//int duty;   // pwm duty for Timer1 (range 0 - 1023) 10-bit resolution
  
 void setup() 
 {
   MotorA.init();
+  MotorB.init();
   Music.init();  
   
 }
@@ -22,15 +23,19 @@ void setup()
 void loop() 
 {
 
-  pos = analogRead(A0);
+  posA = analogRead(A0);
+  posB = analogRead(A3);
   
-  Music.setFrequency(pos);
+  Music.setFrequency1(posA);
+  Music.setFrequency2(posB);
   
-  force = k * (512 - pos);
+  forceA = - kA * (512 - posA);
+  forceB = - kB * (512 - posB);
   //duty = abs(force);
   //duty = min(512, duty);
   
-  MotorA.torque(force);
+  MotorA.torque(forceA);  //force can be -512 to +511
+  MotorB.torque(forceB);  //force can be -512 to +511
   
   //if(force < 0) MotorA.direction(FORWARD);
   //else MotorA.direction(BACKWARD);

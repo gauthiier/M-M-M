@@ -74,26 +74,26 @@ public:
 	void setDetune1(float detune);
 	void setDetune2(float detune);
 	void setDetune3(float detune);
-	void pitchBend(float b);
+	void pitchBend(float b); // NOT IMPLEMENTED
 	
 	// WAVEFORM FUNCTIONS
-	void setWaveform(uint16_t waveForm);
-	void setWaveform1(uint16_t waveForm);
-	void setWaveform2(uint16_t waveForm);
-	void setWaveform3(uint16_t waveForm);
+	void setWaveform(uint16_t waveForm);    // JUST FOR 8bit WAVEFORMS
+	void setWaveform1(uint16_t waveForm);   //
+	void setWaveform2(uint16_t waveForm);   //
+	void setWaveform3(uint16_t waveForm);   //
 	
 	// GAIN FUNCTIONS
 	void setGainFloat(float value); // 0.0 - 1.0
 	void setGain16bit(uint16_t value); // 0 - 65535
 	void setGain(uint16_t value); // 0 - 65535
-	void setGain(float value); // 0.0 - 1.0
+	void setGain(float value); // 0.0 - 1.0         USE THIS
 	void setGain1(uint16_t value); // 0 - 65535 
 	void setGain2(uint16_t value); // 0 - 65535
 	void setGain3(uint16_t value); // 0 - 65535
-	void setGain1(float value); // 0.0 - 1.0 
-	void setGain2(float value); // 0.0 - 1.0
-	void setGain3(float value); // 0.0 - 1.0
-	float getGainFloat();
+	void setGain1(float value); // 0.0 - 1.0        USE THIS
+	void setGain2(float value); // 0.0 - 1.0        USE THIS
+	void setGain3(float value); // 0.0 - 1.0        USE THIS
+	float getGainFloat();       // 0.0 - 1.0        USE THIS
 	uint16_t getGain();
 
 	// NOTE FUNCTIONS
@@ -101,7 +101,7 @@ public:
 	void noteOn(uint8_t note); // 0 - 255
 	void noteOff(uint8_t note); // 0 - 255
 	void noteOff();
-	uint16_t getNoteFrequency(uint8_t note); // 0 - 127
+	uint16_t getNoteFrequency(uint8_t note); // 0 - 127    CHECK THIS OUT
 	
 	// ENVELOPE FUNCTIONS
 	void enableEnvelope();
@@ -113,10 +113,10 @@ public:
 	void setSustain16bit(uint16_t sus); // 0 - 65535
 	void setRelease16bit(uint16_t rel); // 0 - 65535
 	
-	void setAttack(uint8_t att); // 0 - 127
-	void setDecay(uint8_t dec); // 0 - 127
-	void setSustain(uint8_t sus); // 0 - 127
-	void setRelease(uint8_t rel); // 0 - 127	
+	void setAttack(uint8_t att); // 0 - 127             USE THESE ONES
+	void setDecay(uint8_t dec); // 0 - 127              USE THESE ONES
+	void setSustain(uint8_t sus); // 0 - 127            USE THESE ONES
+	void setRelease(uint8_t rel); // 0 - 127            USE THESE ONES
 	
 	void setVelSustain(uint8_t vel); // 0 - 127
 	void setVelPeak(uint8_t vel); // 0 - 127
