@@ -11,6 +11,9 @@ float k, m, d;
 int duty;
 
 void setup() {
+  
+  MotorA.init();
+  
   MotionA.init(INPUTA0);
 
   MotionA.k = 0.2f;   // spring
