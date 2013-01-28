@@ -32,21 +32,15 @@ enum MOTION {
     MOTIONB = 1
 };
 
-enum INPUT {
-    INPUTA0 = 0x00, // bits 0000
-    INPUTA1 = 0x01, // bits 0001
-    INPUTA2 = 0x02, // bits 0010
-    INPUTA3 = 0x03, // bits 0011
-    INPUTA4 = 0x04, // bits 0100
-    INPUTA5 = 0x05, // bits 0101
-    INPUTA6 = 0x06, // bits 0110
-    INPUTA7 = 0x07	// bits 0111
-};
-
-enum PHY {
-    POSITION = 0,
-    VELOCITY = 1,
-    ACCELERATION = 2
+enum SENSOR_INPUT {
+    INPUTA0 = 0x0000,
+    INPUTA1 = 0x0001,
+    INPUTA2 = 0x0010,
+    INPUTA3 = 0x0011,
+    INPUTA4 = 0x0100,
+    INPUTA5 = 0x0101,
+    INPUTA6 = 0x0110,
+    INPUTA7 = 0x0111    
 };
 
 
@@ -55,30 +49,25 @@ class Motion {
 public:
     Motion(MOTION m);
     
-    void init(INPUT sensor);
+    void init(SENSOR_INPUT sensor);
     
-    void set_force_callback(force_callback fcb, PHY physics);  // NOT IMPLEMENTED
-	
-	int getX();
-	
-	float calculateFAVX(int);
-    
-    
+    void update_mass_spring_damper();
+        
     // raw position vector
-    int _xv[N];	// NOT IMPLEMENTED
+    int _xv[N];
     int _ix;    
     
-    float X, V, A, F;    // from model
-    float m, k, d;		// constants from mass-spring-damper model
-    int Xin;            // from the ADC channel specified in Motion constructor (e.g INPUTA0)
-
-
-    MOTION _m;
-    INPUT  _s;
-    bool   _i;	// is it inititated
+    float X, V, F;    
+    float m, k, d;
+    int Xin;
     
-    force_callback _fcb;	// NOT IMPLEMENTED
-    PHY            _fcb_phy; // NOT IMPLEMENTED
+    long tick;
+        
+    MOTION _m;
+    SENSOR_INPUT  _s;
+    bool   _i;
+    
+    force_callback _fcb; // not used in current version
 };
 
 extern Motion MotionA;
