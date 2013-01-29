@@ -51,7 +51,7 @@ Motion::Motion(MOTION m){
     _fcb = NULL;
 };
 
-void Motion::init(INPUT sensor)
+void Motion::init(SENSOR_INPUT sensor)
 {        
     if(!motion_reg_init){
         //TCNT1 = 500;               //4 ms (TCNT1)
@@ -67,13 +67,14 @@ void Motion::init(INPUT sensor)
     m = 1;
 }
 
+/*
 void Motion::set_force_callback(force_callback fcb, PHY physics) {
     _fcb = fcb;
     _fcb_phy = physics;
 }
+*/
 
-
-
+/*
 float Motion::calculateFAVX(int x_in)
 {
 	F = k * (x_in - X) - (d * V);
@@ -82,7 +83,7 @@ float Motion::calculateFAVX(int x_in)
 	X += V * T;
 	return F;
 }
-
+*/
 
 int Motion::getX()
 {

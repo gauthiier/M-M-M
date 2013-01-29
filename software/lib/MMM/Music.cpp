@@ -364,9 +364,45 @@ float MMusic::getGainFloat()
 }
 
 
+float MMusic::getGain1Float()
+{
+	return float(gain1)/65535.0;
+}
+
+
+float MMusic::getGain2Float()
+{
+	return float(gain2)/65535.0;
+}
+
+
+float MMusic::getGain3Float()
+{
+	return float(gain3)/65535.0;
+}
+
+
 uint16_t MMusic::getGain()
 {
 	return gain;
+}
+
+
+uint16_t MMusic::getGain1()
+{
+	return gain1;
+}
+
+
+uint16_t MMusic::getGain2()
+{
+	return gain2;
+}
+
+
+uint16_t MMusic::getGain3()
+{
+	return gain3;
 }
 
 

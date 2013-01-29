@@ -93,8 +93,14 @@ public:
 	void setGain1(float value); // 0.0 - 1.0        USE THIS
 	void setGain2(float value); // 0.0 - 1.0        USE THIS
 	void setGain3(float value); // 0.0 - 1.0        USE THIS
+	float getGain1Float();       // 0.0 - 1.0        USE THIS
+	float getGain2Float();       // 0.0 - 1.0        USE THIS
+	float getGain3Float();       // 0.0 - 1.0        USE THIS
 	float getGainFloat();       // 0.0 - 1.0        USE THIS
 	uint16_t getGain();
+	uint16_t getGain1();
+	uint16_t getGain2();
+	uint16_t getGain3();
 
 	// NOTE FUNCTIONS
 	void noteOn(uint8_t note, uint8_t vel); // 0 - 255
