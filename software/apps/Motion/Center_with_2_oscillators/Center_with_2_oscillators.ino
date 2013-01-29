@@ -1,8 +1,10 @@
-//Center
+//Center two motors control two frequencies. (jb&bv 25Jan13)
 //uses a variable force (pwm duty)
 //If it feels like a mountain - pushing away from center, then
-//reverse the motor leads
+//reverse the motor leads or the sign of forceA or forceB
 //or for a quick fix in the code: change if(f < 0) to if (f > 0)
+
+// notes to me (bv)
 
 #include "Motor.h"
 #include "Music.h"
@@ -16,8 +18,8 @@ int kB = 2;  // spring constant
 void setup() 
 {
   MotorA.init();
-  Music.init();  
-  Music.setWaveform(0); // only works with 8bit waveforms
+  Music.init();  // 12-bit sine default (see .cpp file)
+  //Music.setWaveform(0); // only works with 8bit waveforms
 }
 
 void loop() 
@@ -29,16 +31,11 @@ void loop()
   Music.setFrequency1(posA);
   Music.setFrequency2(posB);
   
-  forceA = - kA * (512 - posA);
+  forceA = - kA * (512 - posA); // check wiring???
   forceB = kB * (512 - posB);
-  //duty = abs(force);
-  //duty = min(512, duty);
   
-  MotorA.torque(forceA);
+  MotorA.torque(forceA); // forceA [-512 to +511] ???
   MotorB.torque(forceB);
-  
-  //if(force < 0) MotorA.direction(FORWARD);
-  //else MotorA.direction(BACKWARD);
     
 }
   

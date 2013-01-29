@@ -360,7 +360,7 @@ void MMusic::setGain3(uint16_t value)
 
 float MMusic::getGainFloat()
 {
-	return float(gain);
+	return float(gain)/65535.0;
 }
 
 

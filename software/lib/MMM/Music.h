@@ -31,7 +31,7 @@
 // SHOULD BE 1, 2 or 3
 //
 ////////////////////////////////////
-#define NUM_OSCILLATORS 2
+#define NUM_OSCILLATORS 3  //edited BV 29Jan13.
 
 
 // current sample rate is 15625 as defined in the init() section
