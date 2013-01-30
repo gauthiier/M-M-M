@@ -195,16 +195,13 @@ void MMidi::controller(uint8_t channel, uint8_t number, uint8_t value) {
 			}
 			break;
 		case GAIN1:
-			//Music.setGain1(uint16_t(value * 512));
-			Music.setGain1(value / 127.0);
+			Music.setGain1(uint16_t(value * 512));
 			break;
 		case GAIN2:
-			//Music.setGain2(uint16_t(value * 512));
-			Music.setGain2(value / 127.0);
+			Music.setGain2(uint16_t(value * 512));
 			break;
 		case GAIN3:
-			//Music.setGain3(uint16_t(value * 512));
-			Music.setGain3(value / 127.0);
+			Music.setGain3(uint16_t(value * 512));
 			break;
 		case WAVEFORM:
 			Music.setWaveform(value / 8);
