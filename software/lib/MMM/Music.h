@@ -32,16 +32,6 @@
 
 #include "Wavetable.h"
 
-
-////////////////////////////////////
-//
-// SET NUMBER OF OSCILLATORS HERE.
-// SHOULD BE 1, 2 or 3
-//
-////////////////////////////////////
-//#define NUM_OSCILLATORS 3  //edited BV 29Jan13.
-
-
 // current sample rate is 15625 as defined in the init() section
 #define SAMPLE_RATE 15625
 
@@ -52,9 +42,16 @@
 #error NUM_OSCILLATORS shall be 1, 2 or 3
 #endif
 
+#ifndef BIT_DEPTH
+#define BIT_DEPTH 8
+#elif (BIT_DEPTH == 8)||(BIT_DEPTH == 12)
+#else
+#error BIT_DEPTH shall be 8 or 12
+#endif
+
+
 // Maximum possible value for amplification envelope
 #define MAX_ENV_GAIN 65535
-
 
 
 // Table of MIDI note values to frequency in Hertz
@@ -102,28 +99,14 @@ public:
 	void setWaveform3(uint16_t waveForm);   //
 	
 	// GAIN FUNCTIONS
-	//void setGainFloat(float value); // 0.0 - 1.0
-	//void setGain16bit(uint16_t value); // 0 - 65535
-	//void setGain(uint16_t value); // 0 - 65535
 	void setGain(float value); // 0.0 - 1.0         USE THIS
-	//void setGain1(uint16_t value); // 0 - 65535 
-	//void setGain2(uint16_t value); // 0 - 65535
-	//void setGain3(uint16_t value); // 0 - 65535
-	//float getGainFloat();       // 0.0 - 1.0        USE THIS
 	void setGain1(float value); // 0.0 - 1.0        USE THIS
 	void setGain2(float value); // 0.0 - 1.0        USE THIS
 	void setGain3(float value); // 0.0 - 1.0        USE THIS
-	//float getGain1Float();       // 0.0 - 1.0        USE THIS
-	//float getGain2Float();       // 0.0 - 1.0        USE THIS
-	//float getGain3Float();       // 0.0 - 1.0        USE THIS
 	float getGain();       // 0.0 - 1.0        USE THIS
 	float getGain1();       // 0.0 - 1.0        USE THIS
 	float getGain2();       // 0.0 - 1.0        USE THIS
 	float getGain3();       // 0.0 - 1.0        USE THIS
-	//uint16_t getGain();
-	//uint16_t getGain1();
-	//uint16_t getGain2();
-	//uint16_t getGain3();
 
 	// NOTE FUNCTIONS
 	void noteOn(uint8_t note, uint8_t vel); // 0 - 255
@@ -220,6 +203,8 @@ private:
 };
 
 extern MMusic Music;
+
+
 
 
 
@@ -447,7 +432,12 @@ void MMusic::synthInterrupt12bitSine()
 }
 
 
+
+
 MMusic Music;
+
+
+
 
 //////////////////////////////////////////////////////////
 //
@@ -458,10 +448,17 @@ MMusic Music;
 ISR(TIMER2_COMPA_vect) { // timer 2 is audio interrupt timer
 	
 	OCR2A = 127; // don't change this
+
+#if	BIT_DEPTH == 8
 	
 	Music.synthInterrupt8bit();
 	
-	//	Music.synthInterrupt12bitSine();
+#endif
+#if BIT_DEPTH == 12
+	
+	Music.synthInterrupt12bitSine();
+	
+#endif
 	
 }
 
@@ -696,24 +693,6 @@ void MMusic::setWaveform3(uint16_t waveForm)
 //
 /////////////////////////////////////
 
-/*
- void MMusic::setGainFloat(float value)
- {
- gain = uint16_t(value * 65535);
- gain1 = gain;
- gain2 = gain;
- gain3 = gain;
- }
- 
- 
- void MMusic::setGain16bit(uint16_t value)
- {
- gain = value;
- gain1 = value;
- gain2 = value;
- gain3 = value;
- }
- */
 
 void MMusic::setGain(float value)
 {
@@ -723,15 +702,6 @@ void MMusic::setGain(float value)
 	gain3 = gain;
 }
 
-/*
- void MMusic::setGain(uint16_t value)
- {
- gain = value;
- gain1 = value;
- gain2 = value;
- gain3 = value;
- }
- */
 
 void MMusic::setGain1(float value)
 {
@@ -750,24 +720,6 @@ void MMusic::setGain3(float value)
 	gain3 = uint16_t(value * 65535);
 }
 
-/*
- void MMusic::setGain1(uint16_t value)
- {
- gain1 = value;
- }
- 
- 
- void MMusic::setGain2(uint16_t value)
- {
- gain2 = value;
- }
- 
- 
- void MMusic::setGain3(uint16_t value)
- {
- gain3 = value;
- }
- */
 
 float MMusic::getGain()
 {
@@ -792,55 +744,7 @@ float MMusic::getGain3()
 	return float(gain3)/65535.0;
 }
 
-/*
- float MMusic::getGainFloat()
- {
- return float(gain)/65535.0;
- }
- 
- 
- float MMusic::getGain1Float()
- {
- return float(gain1)/65535.0;
- }
- 
- 
- float MMusic::getGain2Float()
- {
- return float(gain2)/65535.0;
- }
- 
- 
- float MMusic::getGain3Float()
- {
- return float(gain3)/65535.0;
- }
- 
- 
- uint16_t MMusic::getGain()
- {
- return gain;
- }
- 
- 
- uint16_t MMusic::getGain1()
- {
- return gain1;
- }
- 
- 
- uint16_t MMusic::getGain2()
- {
- return gain2;
- }
- 
- 
- uint16_t MMusic::getGain3()
- {
- return gain3;
- }
- 
- */
+
 
 
 /////////////////////////////////////
@@ -944,7 +848,6 @@ void MMusic::setAttack(uint8_t att)
 {
 	if(att>127) att = 127;
 	memcpy_P(&attack, &envTimeTable[127 - att],2);
-	//attack = envTimeTable[127 - att];
 }
 
 
@@ -952,7 +855,6 @@ void MMusic::setDecay(uint8_t dec)
 {
 	if(dec>127) dec = 127;
 	memcpy_P(&decay, &envTimeTable[127 - dec],2);
-	//decay = envTimeTable[127 - dec];
 }
 
 
@@ -966,7 +868,6 @@ void MMusic::setRelease(uint8_t rel)
 {
 	if(rel>127) rel = 127;
 	memcpy_P(&release, &envTimeTable[127 - rel],2);
-	//release = envTimeTable[127 - rel];
 }
 
 
@@ -981,11 +882,5 @@ void MMusic::setVelPeak(uint8_t vel)
 	velPeak = vel * (MAX_ENV_GAIN / 128);	
 }
 
+#endif // close guard Music_h
 
-
-
-
-
-
-
-#endif // close guard
