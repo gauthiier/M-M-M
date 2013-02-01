@@ -102,8 +102,8 @@ void MMotor::direction(DIRECTION d)
     _d = d;
     if(_m == MOTORA && _d == FORWARD)           PORTD |= (1 << PD7);
     else if(_m == MOTORA && _d == BACKWARD)     PORTD &= ~(1 << PD7);
-    else if(_m == MOTORB && _d == BACKWARD)     PORTB |= (1 << PB0);
-    else if(_m == MOTORB && _d == FORWARD)      PORTB &= ~(1 << PB0);    
+    else if(_m == MOTORB && _d == BACKWARD)     PORTB &= ~(1 << PB0);  // The direction of FORWARD and BACKWARD is 
+    else if(_m == MOTORB && _d == FORWARD)		PORTB |= (1 << PB0);   // switched for MOTORB due to hardware design 
 }
 
 void MMotor::stop()
