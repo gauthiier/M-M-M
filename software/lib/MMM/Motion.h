@@ -51,6 +51,7 @@ public:
     
     void init(SENSOR_INPUT sensor);
     
+    void update_position();
     void update_mass_spring_damper();
         
     // raw position vector

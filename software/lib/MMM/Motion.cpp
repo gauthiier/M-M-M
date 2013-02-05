@@ -50,6 +50,10 @@ void Motion::init(SENSOR_INPUT sensor)
     tick = millis();
 }
 
+void Motion::update_position() {
+    Xin = analogRead(_s); // may take some time
+}
+
 void Motion::update_mass_spring_damper() {        
     
     // todo: filtering
