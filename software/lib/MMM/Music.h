@@ -25,48 +25,113 @@
 #ifndef Music_h // include guard
 #define Music_h
 
+//#include <avr/io.h>  // see if needed
 #include "Arduino.h"
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h> 
 #include <hardwareSerial.h>
-
 #include "Wavetable.h"
+
+
+
 
 // current sample rate is 15625 as defined in the init() section
 #define SAMPLE_RATE 15625
-
-#ifndef NUM_OSCILLATORS
-	#define NUM_OSCILLATORS 1
-#elif (NUM_OSCILLATORS == 1)||(NUM_OSCILLATORS == 2)||(NUM_OSCILLATORS == 3)
-#else
-#error NUM_OSCILLATORS shall be 1, 2 or 3
-#endif
-
-#ifndef BIT_DEPTH
-#define BIT_DEPTH 8
-#elif (BIT_DEPTH == 8)||(BIT_DEPTH == 12)
-#else
-#error BIT_DEPTH shall be 8 or 12
-#endif
-
-
-// Maximum possible value for amplification envelope
-#define MAX_ENV_GAIN 65535
-
-
-// Table of MIDI note values to frequency in Hertz
-prog_uint16_t hertsTable[] PROGMEM = {8,8,9,9,10,10,11,12,12,13,14,15,16,17,18,19,20,21,23,24,25,27,29,30,32,34,36,38,41,43,46,48,51,54,58,61,65,69,73,77,82,87,92,97,103,109,116,123,130,138,146,155,164,174,184,195,207,219,233,246,261,277,293,311,329,349,369,391,415,440,466,493,523,554,587,622,659,698,739,783,830,880,932,987,1046,1108,1174,1244,1318,1396,1479,1567,1661,1760,1864,1975,2093,2217,2349,2489,2637,2793,2959,3135,3322,3520,3729,3951,4186,4434,4698,4978,5274,5587,5919,6271,6644,7040,7458,7902,8372,8869,9397,9956,10548,11175,11839,12543};
-
-prog_uint32_t envTimeTable[] PROGMEM = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,33,34,35,36,37,38,39,41,42,43,45,46,48,49,51,53,55,57,59,61,63,65,67,70,73,75,78,81,85,88,92,96,100,104,109,114,119,125,131,138,146,154,163,172,183,195,209,225,242,261,284,310,341,379,425,482,556,654,792,998,1342,2030,4095};
-
-float semitoneTable[] = {0.25,0.2648658,0.2806155,0.29730177,0.31498027,0.33370996,0.35355338,0.37457678,0.39685026,0.4204482,0.44544938,0.47193715,0.5,0.5297315,0.561231,0.59460354,0.62996054,0.6674199,0.70710677,0.74915355,0.7937005,0.8408964,0.8908987,0.9438743,1.0,1.0594631,1.122462,1.1892071,1.2599211,1.3348398,1.4142135,1.4983071,1.587401,1.6817929,1.7817974,1.8877486,2.0,2.1189263,2.244924,2.3784142,2.5198421,2.6696796,2.828427,2.9966142,3.174802,3.3635857,3.563595,3.7754972,4.0};
 
 // Defining which pins the SPI interface is connected to.
 #define SPI_SCK 5
 #define SPI_MOSI 3
 
+// Checking of NUM_OSCILLATORS is set, and if not, default to 1 oscillator
+#ifndef NUM_OSCILLATORS
+	#define NUM_OSCILLATORS 1
+#elif (NUM_OSCILLATORS == 1)||(NUM_OSCILLATORS == 2)||(NUM_OSCILLATORS == 3)
+#else
+	#error NUM_OSCILLATORS shall be 1, 2 or 3
+#endif
+
+// Checking of BIT_DEPTH is set, and if not, default to 8bit
+#ifndef BIT_DEPTH
+	#define BIT_DEPTH 8
+#elif (BIT_DEPTH == 8)||(BIT_DEPTH == 12)
+#else
+	#error BIT_DEPTH shall be 8 or 12
+#endif
+
+// Shortnames for waveforms
+#define SINE 0
+#define	SQUARE 1
+#define PULSE 2
+#define TRIANGLE 3
+#define SAW 4
+#define FUZZ 5
+#define DIGI1 6
+#define DIGI2 7
+#define DIGI3 8
+#define DIGI4 9
+#define NOISE 10
+#define DIGI6 11
+#define TAN1 12
+#define TAN2 13
+#define TAN3 14
+#define TAN4 15
+
+// Maximum possible value for amplification envelope in audio code
+#define MAX_ENV_GAIN 65535
 
 
+
+
+// MIDI specific constants
+#ifndef MIDI_CHANNEL
+	#define MIDI_CHANNEL 1
+#elif (MIDI_CHANNEL > 0)&&(MIDI_CHANNEL < 17)
+#else
+	#error MIDI_CHANNEL should be between 1 - 16
+#endif
+
+//synth parameters as MIDI controller numbers
+#define DETUNE 4
+#define WAVEFORM 5
+#define PORTAMENTO 6	// not implemented yet
+
+#define FREQUENCY1 10
+#define SEMITONE1 11
+#define DETUNE1 12
+#define GAIN1 13
+#define WAVEFORM1 14
+
+#define FREQUENCY2 20
+#define SEMITONE2 21
+#define DETUNE2 22
+#define GAIN2 23
+#define WAVEFORM2 24
+
+#define FREQUENCY3 30
+#define SEMITONE3 31
+#define DETUNE3 32
+#define GAIN3 33
+#define WAVEFORM3 34
+
+#define ENV_ATTACK 114
+#define ENV_DECAY 115
+#define ENV_SUSTAIN 116
+#define ENV_RELEASE 117
+
+
+
+// Table of MIDI note values to frequency in Hertz
+prog_uint16_t hertzTable[] PROGMEM = {8,8,9,9,10,10,11,12,12,13,14,15,16,17,18,19,20,21,23,24,25,27,29,30,32,34,36,38,41,43,46,48,51,54,58,61,65,69,73,77,82,87,92,97,103,109,116,123,130,138,146,155,164,174,184,195,207,219,233,246,261,277,293,311,329,349,369,391,415,440,466,493,523,554,587,622,659,698,739,783,830,880,932,987,1046,1108,1174,1244,1318,1396,1479,1567,1661,1760,1864,1975,2093,2217,2349,2489,2637,2793,2959,3135,3322,3520,3729,3951,4186,4434,4698,4978,5274,5587,5919,6271,6644,7040,7458,7902,8372,8869,9397,9956,10548,11175,11839,12543};
+
+// Used in the functions that set the envelope timing
+prog_uint32_t envTimeTable[] PROGMEM = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,73,75,77,79,81,83,85,87,89,92,95,98,101,104,108,112,116,120,124,128,132,136,140,145,150,155,160,165,170,176,182,188,194,201,208,215,222,230,238,247,257,268,280,293,307,322,341,379,425,482,556,654,792,998,1342,2030,4095};
+
+float semitoneTable[] = {0.25,0.2648658,0.2806155,0.29730177,0.31498027,0.33370996,0.35355338,0.37457678,0.39685026,0.4204482,0.44544938,0.47193715,0.5,0.5297315,0.561231,0.59460354,0.62996054,0.6674199,0.70710677,0.74915355,0.7937005,0.8408964,0.8908987,0.9438743,1.0,1.0594631,1.122462,1.1892071,1.2599211,1.3348398,1.4142135,1.4983071,1.587401,1.6817929,1.7817974,1.8877486,2.0,2.1189263,2.244924,2.3784142,2.5198421,2.6696796,2.828427,2.9966142,3.174802,3.3635857,3.563595,3.7754972,4.0};
+
+
+
+
+// MMusic class for handling sound engine
 
 class MMusic {    
 public:
@@ -99,14 +164,14 @@ public:
 	void setWaveform3(uint16_t waveForm);   //
 	
 	// GAIN FUNCTIONS
-	void setGain(float value); // 0.0 - 1.0         USE THIS
-	void setGain1(float value); // 0.0 - 1.0        USE THIS
-	void setGain2(float value); // 0.0 - 1.0        USE THIS
-	void setGain3(float value); // 0.0 - 1.0        USE THIS
-	float getGain();       // 0.0 - 1.0        USE THIS
-	float getGain1();       // 0.0 - 1.0        USE THIS
-	float getGain2();       // 0.0 - 1.0        USE THIS
-	float getGain3();       // 0.0 - 1.0        USE THIS
+	void setGain(float value); // 0.0 - 1.0          
+	void setGain1(float value); // 0.0 - 1.0         
+	void setGain2(float value); // 0.0 - 1.0         
+	void setGain3(float value); // 0.0 - 1.0         
+	float getGain();       // 0.0 - 1.0         
+	float getGain1();       // 0.0 - 1.0         
+	float getGain2();       // 0.0 - 1.0         
+	float getGain3();       // 0.0 - 1.0         
 
 	// NOTE FUNCTIONS
 	void noteOn(uint8_t note, uint8_t vel); // 0 - 255
@@ -125,10 +190,10 @@ public:
 	void setSustain16bit(uint16_t sus); // 0 - 65535
 	void setRelease16bit(uint16_t rel); // 0 - 65535
 	
-	void setAttack(uint8_t att); // 0 - 127             USE THESE ONES
-	void setDecay(uint8_t dec); // 0 - 127              USE THESE ONES
-	void setSustain(uint8_t sus); // 0 - 127            USE THESE ONES
-	void setRelease(uint8_t rel); // 0 - 127            USE THESE ONES
+	void setAttack(uint8_t att); // 0 - 127              
+	void setDecay(uint8_t dec); // 0 - 127               
+	void setSustain(uint8_t sus); // 0 - 127             
+	void setRelease(uint8_t rel); // 0 - 127             
 	
 	void setVelSustain(uint8_t vel); // 0 - 127
 	void setVelPeak(uint8_t vel); // 0 - 127
@@ -203,6 +268,67 @@ private:
 };
 
 extern MMusic Music;
+
+
+
+
+#ifdef MIDI
+
+// MMidi class for handling MIDI implementation
+
+class MMidi {
+public:
+	void init();
+	void checkMidi();
+	
+	void midiHandler();
+	void noteOff(uint8_t channel, uint8_t note, uint8_t vel);
+	void noteOn(uint8_t channel, uint8_t note, uint8_t vel);
+	void aftertouch(uint8_t channel, uint8_t note, uint8_t pressure);
+	void controller(uint8_t channel, uint8_t number, uint8_t value);
+	void programChange(uint8_t channel, uint8_t number);
+	void channelPressure(uint8_t channel, uint8_t pressure);
+	void pitchWheel(uint8_t channel, uint8_t highBits, uint8_t lowBits);
+	
+private:
+	
+	// MIDI
+	uint8_t data;
+	uint8_t midiBuffer[3];
+	uint8_t midiChannel;
+	
+	int midiBufferIndex;
+	uint16_t frequency;
+	uint8_t notePlayed;
+};
+
+extern MMidi Midi;
+
+#endif
+
+
+
+//////////////////////////////////////////////////////////
+//
+// AUDIO INTERRUPT - The pre-processor selects 8 or 12 bit
+//
+//////////////////////////////////////////////////////////
+ISR(TIMER2_COMPA_vect) { // timer 2 is audio interrupt timer
+	
+	OCR2A = 127; // don't change this
+	
+#if	BIT_DEPTH == 8
+	
+	Music.synthInterrupt8bit();
+	
+#endif
+#if BIT_DEPTH == 12
+	
+	Music.synthInterrupt12bitSine();
+	
+#endif
+	
+}
 
 
 
@@ -283,15 +409,15 @@ void inline MMusic::synthInterrupt8bit()
 				envStage = 0;
 			}
 		}
-		
-		// No gain
-		else if (envStage == 0) {
-			env = 0;
-			accumulator1 = 0;
-			accumulator2 = 0;
-			accumulator3 = 0;
-		}
-		
+		/*		 
+		 // No gain
+		 else if (envStage == 0) {
+		 env = 0;
+		 //accumulator1 = 0;
+		 //accumulator2 = 0;
+		 //accumulator3 = 0;
+		 }
+		 */		 
 	} else {
 		env = 65535;
 	}
@@ -428,7 +554,6 @@ void MMusic::synthInterrupt12bitSine()
 	// Frame sync high
 	PORTD |= (1<<3);
 	
-	
 }
 
 
@@ -436,31 +561,9 @@ void MMusic::synthInterrupt12bitSine()
 
 MMusic Music;
 
-
-
-
-//////////////////////////////////////////////////////////
-//
-// AUDIO INTERRUPT. USE EITHER 8bit or 12bitSine VERSION
-// COMMENT OUT THE ONE YOU ARE NOT USING
-//
-//////////////////////////////////////////////////////////
-ISR(TIMER2_COMPA_vect) { // timer 2 is audio interrupt timer
-	
-	OCR2A = 127; // don't change this
-
-#if	BIT_DEPTH == 8
-	
-	Music.synthInterrupt8bit();
-	
+#ifdef MIDI
+MMidi Midi;
 #endif
-#if BIT_DEPTH == 12
-	
-	Music.synthInterrupt12bitSine();
-	
-#endif
-	
-}
 
 
 
@@ -760,7 +863,7 @@ void MMusic::noteOn(uint8_t note, uint8_t vel)
 	setVelSustain(vel);
 	setVelPeak(vel);
 	notePlayed = note;
-	memcpy_P(&frequency16bit, &hertsTable[notePlayed],2);
+	memcpy_P(&frequency16bit, &hertzTable[notePlayed],2);
 	setFrequency1(frequency16bit);
 	setFrequency2(frequency16bit);
 	setFrequency3(frequency16bit);
@@ -773,7 +876,7 @@ void MMusic::noteOn(uint8_t note)
 	setVelSustain(127);
 	setVelPeak(127);
 	notePlayed = note;
-	memcpy_P(&frequency16bit, &hertsTable[notePlayed],2);
+	memcpy_P(&frequency16bit, &hertzTable[notePlayed],2);
 	setFrequency1(frequency16bit);
 	setFrequency2(frequency16bit);
 	setFrequency3(frequency16bit);
@@ -881,6 +984,234 @@ void MMusic::setVelPeak(uint8_t vel)
 {
 	velPeak = vel * (MAX_ENV_GAIN / 128);	
 }
+
+
+
+
+#ifdef MIDI
+
+/////////////////////////////////////
+//
+//	MIDI specific functions
+//
+/////////////////////////////////////
+
+bool midiRead = false;
+
+void MMidi::init()
+{	
+	Serial.begin(115200);
+	
+	midiBufferIndex = 0;
+	midiChannel = MIDI_CHANNEL - 1;
+	if(midiChannel < 0 || midiChannel > 15) midiChannel = 0;
+	
+}
+
+void MMidi::checkMidi()
+{
+	while(Serial.available() > 0) {
+		
+		data = Serial.read();
+		
+		if(data & 0x80 && (data & 0x0F) == midiChannel) {	// bitmask with 10000000 to see if byte is over 127 (data&0x80)
+			midiBufferIndex = 0;							// and check if the midi channel corresponds to the midiChannel
+			midiRead = true;								// the device is set to listen to.
+		} else if(data & 0x80) {							// Else if the byte is over 127 (but not on the device's
+			midiRead = false;								// midiChannel, don't read this or any following bytes.
+		}
+		
+		if(midiRead) {
+			midiBuffer[midiBufferIndex] = data;
+			midiBufferIndex++;
+			if (midiBufferIndex > 2) {
+				midiHandler();
+			}
+		}
+	}	
+}
+
+
+void MMidi::midiHandler() {
+	
+    uint8_t midiChannel = (midiBuffer[0] & 0x0F);
+    
+	
+	switch(midiBuffer[0] & 0xF0) { // bit mask with &0xF0 ?
+        case 0x80:
+			noteOff			(midiBuffer[0] & 0x0F,     // midi channel 0-16
+							 midiBuffer[1] & 0x7F,   // note value 0-127
+							 midiBuffer[2] & 0x7F);  // note velocity 0-127
+			break;
+			
+        case 0x90:
+			noteOn			(midiBuffer[0] & 0x0F,     // midi channel 0-16
+							 midiBuffer[1] & 0x7F,   // note value 0-127
+							 midiBuffer[2] & 0x7F);  // note velocity 0-127
+			break;
+			
+        case 0xA0:
+			aftertouch		(midiBuffer[0] & 0x0F,   // midi channel 0-16
+							 midiBuffer[1] & 0x7F, // note value 0-127
+							 midiBuffer[2] & 0x7F);// note velocity 0-127
+			break;
+			
+        case 0xB0:
+			controller		(midiBuffer[0] & 0x0F,   // midi channel 0-16
+							 midiBuffer[1] & 0x7F, // controller number 0-127
+							 midiBuffer[2] & 0x7F);// controller value 0-127
+			break;
+			
+        case 0xC0:
+			programChange	(midiBuffer[0]  & 0x0F,    // midi channel 0-16
+							 midiBuffer[1] & 0x7F);  // program number 0-127
+			break;
+			
+        case 0xD0:
+			channelPressure	(midiBuffer[0]  & 0x0F,    // midi channel 0-16
+							 midiBuffer[1] & 0x7F);  // pressure amount 0-127
+			break;
+			
+        case 0xE0:
+			pitchWheel		(midiBuffer[0] & 0x0F,   // midi channel 0-16
+							 midiBuffer[1] & 0x7F, // higher bits 0-6
+							 midiBuffer[2] & 0x7F);// lower bits 7-13
+			break;
+			
+        default:
+			break;
+	}
+}
+
+
+void MMidi::noteOff(uint8_t channel, uint8_t note, uint8_t vel) {
+	
+	if(notePlayed == note) {
+		Music.setEnvStage(4);
+	}
+}
+
+
+void MMidi::noteOn(uint8_t channel, uint8_t note, uint8_t vel) {
+	
+	Music.setEnvStage(1);
+	Music.setVelSustain(vel);
+	Music.setVelPeak(vel);
+	notePlayed = note;
+	memcpy_P(&frequency, &hertzTable[notePlayed],2);
+	Music.setFrequency1(frequency);
+	Music.setFrequency2(frequency);
+	Music.setFrequency3(frequency);	
+}
+
+
+void MMidi::aftertouch(uint8_t channel, uint8_t note, uint8_t pressure) {
+	// Write code here for Aftertouch 
+}
+
+
+void MMidi::controller(uint8_t channel, uint8_t number, uint8_t value) {
+	
+	switch(number) {
+		case DETUNE:
+			Music.setDetune(value/5120.0);
+			break;
+		case PORTAMENTO:
+			//Music.setPortamento(value);  // function to be defined, also argument
+			break;
+		case DETUNE1:
+			Music.setDetune1(value/5120.0);
+			break;
+		case DETUNE2:
+			Music.setDetune2(value/5120.0);
+			break;
+		case DETUNE3:
+			Music.setDetune3(value/5120.0);
+			break;
+		case SEMITONE1:
+			if(15 < value && value < 113) {
+				int8_t val = (((value-16)/2)-24);
+				Music.setSemitone1(val);
+			} else if (value < 16) {
+				Music.setSemitone1(-24);				
+			} else {
+				Music.setSemitone1(24);
+			}
+			break;
+		case SEMITONE2:
+			if(15 < value && value < 113) {
+				int8_t val = (((value-16)/2)-24);
+				Music.setSemitone2(val);
+			} else if (value < 16) {
+				Music.setSemitone2(-24);				
+			} else {
+				Music.setSemitone2(24);
+			}
+			break;
+		case SEMITONE3:
+			if(15 < value && value < 113) {
+				int8_t val = (((value-16)/2)-24);
+				Music.setSemitone3(val);
+			} else if (value < 16) {
+				Music.setSemitone3(-24);				
+			} else {
+				Music.setSemitone3(24);
+			}
+			break;
+		case GAIN1:
+			Music.setGain1(value / 127.0);
+			break;
+		case GAIN2:
+			Music.setGain2(value / 127.0);
+			break;
+		case GAIN3:
+			Music.setGain3(value / 127.0);
+			break;
+		case WAVEFORM:
+			Music.setWaveform(value / 8);
+			break;
+		case WAVEFORM1:
+			Music.setWaveform1(value / 8);
+			break;
+		case WAVEFORM2:
+			Music.setWaveform2(value / 8);
+			break;
+		case WAVEFORM3:
+			Music.setWaveform3(value / 8);
+			break;
+		case ENV_ATTACK:
+			Music.setAttack(value);
+			break;
+		case ENV_DECAY:
+			Music.setDecay(value);
+			break;
+		case ENV_SUSTAIN:
+			Music.setSustain(value);
+			break;
+		case ENV_RELEASE:
+			Music.setRelease(value);
+			break;
+		default:
+			break;
+	} 
+}
+
+
+void MMidi::programChange(uint8_t channel, uint8_t number) {
+	// Write code here for Program Change 
+}
+
+
+void MMidi::channelPressure(uint8_t channel, uint8_t pressure) {
+	// Write code here for Channel Pressure 
+}
+
+
+void MMidi::pitchWheel(uint8_t channel, uint8_t highBits, uint8_t lowBits) {
+	// Write code here for Pitch Wheel
+}
+
+#endif
 
 #endif // close guard Music_h
 
