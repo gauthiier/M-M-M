@@ -1,11 +1,7 @@
 // CenterAB - both motors
-// Freqequency1 B->Frequency2
-//CenterA at xB, CenterB at xA?
+// xA->Freqequency1, xB->Frequency2
+//CenterA at xB, CenterB at xA
 //feels like "Slave"
-//position on A0, pwm:D9, dir:D8,D7
-//CenterB
-//position on A3, pwm:D10, dir:D11,D12
-
 
 #include <Motor.h>
 #include <Music.h>
@@ -20,7 +16,7 @@ void setup(){
   MotorA.init();
   MotorB.init();
   Music.init();
-  Music.setWaveform1(0);//8bit
+  Music.setWaveform1(0);//8bit default?
   Music.setWaveform2(0);
   Music.setGain1(1.0f);
   Music.setGain2(1.0f);

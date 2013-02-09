@@ -45,7 +45,7 @@ while (Serial.available()) {
       Music.setGain(1.0f);
     }
     if(x>10){
-    Music.setGain(0.998f*Music.getGainFloat());
+    Music.setGain(0.998f*Music.getGain());
     }
   }
 }

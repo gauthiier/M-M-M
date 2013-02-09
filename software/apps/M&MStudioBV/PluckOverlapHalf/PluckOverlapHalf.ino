@@ -18,8 +18,8 @@ void setup(){
 }
 
 void loop(){
-  //x = analogRead(A0) - 512;
-  x = analogRead(A3) - 512;
+  x = analogRead(A0) - 512;
+  //x = analogRead(A3) - 512;
   if (forward){
     if (x <= - w/2) f = 0;
     if (x > -w/2 && x< w/2) f = - slope*(x + w/2);
@@ -40,8 +40,8 @@ void loop(){
     }
   }
   fout = int(f);
-  //MotorA.torque(fout);
-  MotorB.torque(fout);
+  MotorA.torque(fout);
+  //MotorB.torque(fout);
   if(count++>=0){
     count=-1000; // wait 1000 loops before print
     Serial.print(x,DEC);
