@@ -18,8 +18,37 @@ init		KEYWORD2
 checkMidi	KEYWORD2
 enableEnvelope	KEYWORD2
 diableEnvelope	KEYWORD2
+setEnvStage	KEYWORD2
 setDetune	KEYWORD2
-
+setDetune1	KEYWORD2
+setDetune2	KEYWORD2
+setDetune3	KEYWORD2
+setFrequency	KEYWORD2
+setFrequency1	KEYWORD2
+setFrequency2	KEYWORD2
+setFrequency3	KEYWORD2
+setSemitone1	KEYWORD2
+setSemitone2	KEYWORD2
+setSemitone3	KEYWORD2
+setWaveform	KEYWORD2
+setWaveform1	KEYWORD2
+setWaveform2	KEYWORD2
+setWaveform3	KEYWORD2
+setGain		KEYWORD2
+setGain1	KEYWORD2
+setGain2	KEYWORD2
+setGain3	KEYWORD2
+getGain		KEYWORD2
+getGain1	KEYWORD2
+getGain2	KEYWORD2
+getGain3	KEYWORD2
+noteOn		KEYWORD2
+noteOff		KEYWORD2
+getNoteFrequency	KEYWORD2
+setAttack	KEYWORD2
+setDecay	KEYWORD2
+setSustain	KEYWORD2
+setRelease	KEYWORD2
 
 
 #######################################
@@ -27,3 +56,5 @@ setDetune	KEYWORD2
 #######################################
 
 NUM_OSCILLATORS	LITERAL1
+BIT_DEPTH	LITERAL1
+MIDI		LITERAL1
