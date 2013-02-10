@@ -174,21 +174,16 @@ public:
 	float getGain3();       // 0.0 - 1.0         
 
 	// NOTE FUNCTIONS
-	void noteOn(uint8_t note, uint8_t vel); // 0 - 255
-	void noteOn(uint8_t note); // 0 - 255
-	void noteOff(uint8_t note); // 0 - 255
+	void noteOn(uint8_t note, uint8_t vel); // 0 - 127
+	void noteOn(uint8_t note); // 0 - 127
+	void noteOff(uint8_t note); // 0 - 127
 	void noteOff();
-	uint16_t getNoteFrequency(uint8_t note); // 0 - 127    CHECK THIS OUT
+	uint16_t getNoteFrequency(uint8_t note); // 0 - 127
 	
 	// ENVELOPE FUNCTIONS
 	void enableEnvelope();
 	void disableEnvelope();
 	void setEnvStage(uint8_t stage); // 0 - 4
-	
-	void setAttack16bit(uint16_t att); // 0 - 65535
-	void setDecay16bit(uint16_t dec); // 0 - 65535
-	void setSustain16bit(uint16_t sus); // 0 - 65535
-	void setRelease16bit(uint16_t rel); // 0 - 65535
 	
 	void setAttack(uint8_t att); // 0 - 127              
 	void setDecay(uint8_t dec); // 0 - 127               
@@ -898,6 +893,13 @@ void MMusic::noteOff()
 
 
 
+uint16_t MMusic::getNoteFrequency(uint8_t note)
+{
+	int f;
+	memcpy_P(&f, &hertzTable[note], 2);
+	return f;
+}
+
 
 /////////////////////////////////////
 //
@@ -920,30 +922,6 @@ void MMusic::disableEnvelope()
 void MMusic::setEnvStage(uint8_t stage)
 {
 	envStage = stage;
-}
-
-
-void MMusic::setAttack16bit(uint16_t att)
-{
-	attack = att;
-}
-
-
-void MMusic::setDecay16bit(uint16_t dec)
-{
-	decay = dec;
-}
-
-
-void MMusic::setSustain16bit(uint16_t sus)
-{
-	sustain = sus;
-}
-
-
-void MMusic::setRelease16bit(uint16_t rel)
-{
-	release = rel;
 }
 
 
@@ -1000,7 +978,7 @@ bool midiRead = false;
 
 void MMidi::init()
 {	
-	Serial.begin(115200);
+	Serial.begin(9600);
 	
 	midiBufferIndex = 0;
 	midiChannel = MIDI_CHANNEL - 1;
@@ -1111,6 +1089,7 @@ void MMidi::aftertouch(uint8_t channel, uint8_t note, uint8_t pressure) {
 
 
 void MMidi::controller(uint8_t channel, uint8_t number, uint8_t value) {
+	//Serial.print(value);
 	
 	switch(number) {
 		case DETUNE:
@@ -1118,6 +1097,15 @@ void MMidi::controller(uint8_t channel, uint8_t number, uint8_t value) {
 			break;
 		case PORTAMENTO:
 			//Music.setPortamento(value);  // function to be defined, also argument
+			break;
+		case FREQUENCY1:
+			Music.setFrequency1(Music.getNoteFrequency(value));
+			break;
+		case FREQUENCY2:
+			Music.setFrequency2(Music.getNoteFrequency(value));
+			break;
+		case FREQUENCY3:
+			Music.setFrequency3(Music.getNoteFrequency(value));
 			break;
 		case DETUNE1:
 			Music.setDetune1(value/5120.0);
