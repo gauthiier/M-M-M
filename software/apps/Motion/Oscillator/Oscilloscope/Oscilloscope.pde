@@ -37,7 +37,7 @@ import processing.serial.*;
 void setup() {
   
   int b = 15;
-  int h = (displayHeight / 4) - (3*b);
+  int h = 300;//(displayHeight / 4) - (3*b);
   int w = displayWidth / 2;
   
   plotA = new ScopePlot("Force", w, h, b, b + b, 512, true);
@@ -69,6 +69,8 @@ void setup() {
   d_slider.addListener(scb);
   
   size(w + 60, displayHeight - (h + (3*b)));
+  //size(w + 60, 800);
+  //size(600, 800);
 }
 
 void draw() {
