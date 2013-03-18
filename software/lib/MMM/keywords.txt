@@ -7,7 +7,10 @@
 #######################################
 
 Music	KEYWORD1
-Motor	KEYWORD1
+MotorA	KEYWORD1
+MotorB	KEYWORD1
+MotionA	KEYWORD1
+MotionB	KEYWORD1
 Midi	KEYWORD1
 
 #######################################
@@ -49,6 +52,13 @@ setAttack	KEYWORD2
 setDecay	KEYWORD2
 setSustain	KEYWORD2
 setRelease	KEYWORD2
+update_position	KEYWORD2
+update_mass_spring_damper	KEYWORD2
+torque		KEYWORD2
+direction	KEYWORD2
+stop		KEYWORD2
+start		KEYWORD2
+restart		KEYWORD2
 
 
 #######################################
