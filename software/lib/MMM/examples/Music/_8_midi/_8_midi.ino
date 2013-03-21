@@ -10,14 +10,18 @@
 // The Music object is automatically instantiated when the header file is
 // included. Make calls to the Music objects with "Music.function(args)".
 // You still need to call Music.init() in the setup() function below.
+#define NUM_OSCILLATORS 3
+#define BIT_DEPTH 8
+#define MIDI
+#define MIDI_CHANNEL 1
 #include <Music.h>
 
 void setup() {
 
   // We initialise the sound engine by calling Music.init() which outputs a tone
   Music.init();
-  Midi.init();
   Music.enableEnvelope();
+  Midi.init();
 
 }
 
