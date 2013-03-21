@@ -1,5 +1,13 @@
+<<<<<<< HEAD:software/lib/MMM/examples/Motion/_6_Bumps/_6_Bumps.ino
 //Plucks - four bumps / three notes (400,500,600hz)
 #define NUM_OSCILLATORS 3
+=======
+//plucks - four bumps
+//three notes (400,500,600hz)
+//can't get Music.setGain1, etc to work only Music.setGain() starts all of them.
+#define NUM_OSCILLATORS 3
+#define BIT_DEPTH 8
+>>>>>>> update notes to motion.cpp:software/apps/Modeling/Bumps4/Bumps4.ino
 #include <Music.h>
 #include <Motor.h>
 
@@ -26,6 +34,7 @@ void loop(){
 
 if (((xold <= 125) && (x > 125)) || ((xold >= 125) && (x < 125))){
   Music.setGain1(1.0f);
+<<<<<<< HEAD:software/lib/MMM/examples/Motion/_6_Bumps/_6_Bumps.ino
 }
 if (((xold <= 375) && (x > 375)) || ((xold >= 375) && (x < 375))){
   Music.setGain2(1.0f);
@@ -35,6 +44,21 @@ if (((xold <= 625) && (x > 625)) || ((xold >= 625) && (x < 625))){
 }
 if (((xold <= 875) && (x > 875)) || ((xold >= 875) && (x < 875))){
   Music.setGain1(1.0f);
+=======
+  Music.setFrequency1(200);
+}
+if (((xold <= 375) && (x > 375)) || ((xold >= 375) && (x < 375))){
+  Music.setGain2(1.0f);
+  Music.setFrequency2(250);
+}
+if (((xold <= 625) && (x > 625)) || ((xold >= 625) && (x < 625))){
+  Music.setGain3(1.0f);
+  Music.setFrequency3(300);
+}
+if (((xold <= 875) && (x > 875)) || ((xold >= 875) && (x < 875))){
+  Music.setGain1(1.0f);
+  Music.setFrequency1(400);
+>>>>>>> update notes to motion.cpp:software/apps/Modeling/Bumps4/Bumps4.ino
   }
   else{
     Music.setGain1(0.995f*Music.getGain1());

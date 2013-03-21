@@ -61,7 +61,7 @@ void Motion::update_mass_spring_damper() {
     long t = millis();
     float dt = (float)(t - tick) / 100.0f;
     
-    int xin = analogRead(_s); // may take some time
+    int xin = analogRead(_s); // may take some time, put: 512 - analogRead(_s);
     
     Xin = xin;
     F = k * (xin - X) - (d * V);
