@@ -17,10 +17,10 @@ Midi	KEYWORD1
 # Methods and Functions (KEYWORD2)
 #######################################
 
-init		KEYWORD2
+init	KEYWORD2
 checkMidi	KEYWORD2
 enableEnvelope	KEYWORD2
-diableEnvelope	KEYWORD2
+disableEnvelope	KEYWORD2
 setEnvStage	KEYWORD2
 setDetune	KEYWORD2
 setDetune1	KEYWORD2
@@ -37,16 +37,16 @@ setWaveform	KEYWORD2
 setWaveform1	KEYWORD2
 setWaveform2	KEYWORD2
 setWaveform3	KEYWORD2
-setGain		KEYWORD2
+setGain	KEYWORD2
 setGain1	KEYWORD2
 setGain2	KEYWORD2
 setGain3	KEYWORD2
-getGain		KEYWORD2
+getGain	KEYWORD2
 getGain1	KEYWORD2
 getGain2	KEYWORD2
 getGain3	KEYWORD2
-noteOn		KEYWORD2
-noteOff		KEYWORD2
+noteOn	KEYWORD2
+noteOff	KEYWORD2
 getNoteFrequency	KEYWORD2
 setAttack	KEYWORD2
 setDecay	KEYWORD2
@@ -54,11 +54,11 @@ setSustain	KEYWORD2
 setRelease	KEYWORD2
 update_position	KEYWORD2
 update_mass_spring_damper	KEYWORD2
-torque		KEYWORD2
+torque	KEYWORD2
 direction	KEYWORD2
-stop		KEYWORD2
-start		KEYWORD2
-restart		KEYWORD2
+stop	KEYWORD2
+start	KEYWORD2
+restart KEYWORD2
 
 
 #######################################
@@ -67,4 +67,5 @@ restart		KEYWORD2
 
 NUM_OSCILLATORS	LITERAL1
 BIT_DEPTH	LITERAL1
-MIDI		LITERAL1
+MIDI	LITERAL1
+MIDI_CHANNEL LITERAL1

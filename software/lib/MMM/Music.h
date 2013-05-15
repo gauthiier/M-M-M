@@ -338,10 +338,15 @@ ISR(TIMER2_COMPA_vect) { // timer 2 is audio interrupt timer
 
 void inline MMusic::synthInterrupt8bit()
 {
+	
 	PORTD &= ~(1<<3);
 	
 	// Frame sync low for SPI (making it low here so that we can measure lenght of interrupt with scope)
+#ifdef CFO
+	PORTB &= ~(1<<2);
+#else
 	PORTD &= ~(1<<6);
+#endif
 	
 	accumulator1 = accumulator1 + period1;
 	index1 = accumulator1 >> 8;
@@ -436,8 +441,11 @@ void inline MMusic::synthInterrupt8bit()
 	while (!(SPSR & (1<<SPIF)));  // Maybe this can be optimised
 	
 	// Frame sync high
+#ifdef CFO
+	PORTB |= (1<<2);
+#else
 	PORTD |= (1<<6);
-	
+#endif
 }
 
 
@@ -453,7 +461,11 @@ void inline MMusic::synthInterrupt8bit()
 void MMusic::synthInterrupt12bitSine()
 {
 	// Frame sync low for SPI (making it low here so that we can measure lenght of interrupt with scope)
+#ifdef CFO
+	PORTB &= ~(1<<2);
+#else
 	PORTD &= ~(1<<6);
+#endif
 	
 	accumulator1 = accumulator1 + period1;
 	index1 = accumulator1 >> 4;
@@ -544,8 +556,11 @@ void MMusic::synthInterrupt12bitSine()
 	while (!(SPSR & (1<<SPIF)));  // Maybe this can be optimised
 	
 	// Frame sync high
+#ifdef CFO
+	PORTB |= (1<<2);
+#else
 	PORTD |= (1<<6);
-	
+#endif
 	// Frame sync high
 	PORTD |= (1<<3);
 	
@@ -585,14 +600,22 @@ void MMusic::init()
 	// sck + mosi + ss
 	DDRB |= (1 << DDB2) | (1 << DDB3) | (1 << DDB5);
 	// dac_cs output
+#ifdef CFO
+	DDRB |= (1 << DDB2) | (1 << DDB3);
+#else
 	DDRD |= (1 << DDD6) | (1 << DDB3);
+#endif
 	
 	// set up SPI port
 	SPCR = 0x50;
 	SPSR = 0x01;
 	
 	// DAC frame sync HIGH, so that the SPI port doesn't start wirting straight away
+#ifdef CFO
+	PORTB |= (1<<2);
+#else
 	PORTD |= (1<<6);
+#endif
 	
 	// waveform setup
 	//setSine();
@@ -1089,8 +1112,13 @@ void MMidi::aftertouch(uint8_t channel, uint8_t note, uint8_t pressure) {
 
 
 void MMidi::controller(uint8_t channel, uint8_t number, uint8_t value) {
-	//Serial.print(value);
-	
+/*	Serial.println();
+	Serial.print(channel);
+	Serial.print('-');
+	Serial.print(number);
+	Serial.print('-');
+	Serial.println(value);
+*/	
 	switch(number) {
 		case DETUNE:
 			Music.setDetune(value/5120.0);
