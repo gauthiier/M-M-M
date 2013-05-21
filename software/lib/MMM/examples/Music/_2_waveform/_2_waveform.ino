@@ -11,7 +11,7 @@
 // You still need to call Music.init() in the setup() function below.
 #include <Music.h>
 
-int delayTime = 1000;
+int delayTime = 2000;
 int cnt = 0;
 long timeNow;
 long lastTime = 0;

@@ -28,7 +28,7 @@ void loop(){
   Music.setFrequency(frequency);
   
   xB = analogRead(A0);
-  volume = -float(xB)/256.; // B position
+  volume = -float(xB)/1024.; // B position
   volume = pow(10,volume);
   Music.setGain(volume);
   
