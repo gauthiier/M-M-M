@@ -12,10 +12,18 @@
 // If you copy a function from here to your arduino sketch, just change the word "float", "uint8_t", etc into the
 // variable name that you uses in your sketch.
 
+// PREPROCESSING COMMANDS
+#define NUM_OSCILLATORS 3  // define the use of 1, 2 or 3 oscillators
+#define BIT_DEPTH 12       // define the bit depth resolution of 8 or 12 bit waveforms
+#define MIDI               // tell the system you will be using the MIDI part of the sound engine
+#define MIDI_CHANNEL       // set the MIDI channel to listen to. Between 1 and 16
 
-// INITIALIZER
+// INITIALIZERS
 // Use this to start the synth engine. It defaults to a sine tone at 110Hz, no envelope and no detune.
 Music.init();
+
+// Use this to start the MIDI engine. It defaults to a sine tone at 110Hz, no envelope and no detune.
+Midi.init();
 
 
 // FREQUENCY AND DETUNE FUNCTIONS
@@ -107,3 +115,8 @@ Music.setAttack(uint8_t); // 0 - 127
 Music.setDecay(uint8_t); // 0 - 127
 Music.setSustain(uint8_t); // 0 - 127
 Music.setRelease(uint8_t); // 0 - 127
+
+
+// MIDI FUNCTIONS
+Midi.checkMidi() // put this function in the loop() function in your
+                 // Arduino sketch to check for incoming MIDI activity
