@@ -42,7 +42,7 @@
 #define SPI_SCK 5
 #define SPI_MOSI 3
 
-// Checking of NUM_OSCILLATORS is set, and if not, default to 1 oscillator
+// Checking if NUM_OSCILLATORS is set, and if not, default to 1 oscillator
 #ifndef NUM_OSCILLATORS
 	#define NUM_OSCILLATORS 1
 #elif (NUM_OSCILLATORS == 1)||(NUM_OSCILLATORS == 2)||(NUM_OSCILLATORS == 3)
@@ -50,13 +50,14 @@
 	#error NUM_OSCILLATORS shall be 1, 2 or 3
 #endif
 
-// Checking of BIT_DEPTH is set, and if not, default to 8bit
+// Checking if BIT_DEPTH is set, and if not, default to 8bit
 #ifndef BIT_DEPTH
 	#define BIT_DEPTH 8
 #elif (BIT_DEPTH == 8)||(BIT_DEPTH == 12)
 #else
 	#error BIT_DEPTH shall be 8 or 12
 #endif
+
 
 // Shortnames for waveforms
 #define SINE 0
@@ -141,7 +142,9 @@ public:
 
 	// AUDIO INTERRUPT SERVICE ROUTINE
 	void synthInterrupt8bit();
+	void synthInterrupt8bitFM();
 	void synthInterrupt12bitSine();
+	void synthInterrupt12bitSineFM();
 		
 	// FREQUENCY AND DETUNE FUNCTIONS
 	void setFrequency(float frequency);
@@ -155,6 +158,9 @@ public:
 	void setDetune1(float detune);
 	void setDetune2(float detune);
 	void setDetune3(float detune);
+	void setFM1(uint8_t fm);
+	void setFM2(uint8_t fm);
+	void setFM3(uint8_t fm);
 	void pitchBend(float b); // NOT IMPLEMENTED
 	
 	// WAVEFORM FUNCTIONS
@@ -233,6 +239,12 @@ private:
 	uint32_t oscil1;
 	uint32_t oscil2;
 	uint32_t oscil3;
+	int32_t modulator1;
+	int32_t modulator2;
+	int32_t modulator3;
+	int8_t fmAmount1;
+	int8_t fmAmount2;
+	int8_t fmAmount3;
 	uint16_t gain;
 	uint16_t gain1;
 	uint16_t gain2;
@@ -313,14 +325,18 @@ ISR(TIMER2_COMPA_vect) { // timer 2 is audio interrupt timer
 	OCR2A = 127; // don't change this
 	
 #if	BIT_DEPTH == 8
-	
-	Music.synthInterrupt8bit();
-	
+	#ifdef FM	
+		Music.synthInterrupt8bitFM();
+	#else
+		Music.synthInterrupt8bit();
+	#endif
 #endif
 #if BIT_DEPTH == 12
-	
-	Music.synthInterrupt12bitSine();
-	
+	#ifdef FM	
+		Music.synthInterrupt12bitSineFM();
+	#else
+		Music.synthInterrupt12bitSine();
+	#endif
 #endif
 	
 }
@@ -374,6 +390,118 @@ void inline MMusic::synthInterrupt8bit()
 #endif
 	
 	sample >>= 10;
+	
+	
+	// AMPLIFICATION ENVELOPE
+	// Amplification envelope is calculated here
+	if(envelopeOn) {
+		
+		// Attack
+		if(envStage == 1) {
+			env += attack;
+			if(velPeak < env) {
+				env = velPeak;
+				envStage = 2;
+			}
+		}
+		// Decay
+		else if(envStage == 2) {
+			env -= decay;
+			if(env < velSustain || MAX_ENV_GAIN < env) {
+				env = velSustain;
+				envStage = 3;
+			}
+		}
+		// Sustain
+		else if (envStage == 3) {
+			env = velSustain;
+		}
+		
+		// Release
+		else if (envStage == 4) {
+			env -= release;
+			if(MAX_ENV_GAIN < env) {
+				env = 0;
+				envStage = 0;
+			}
+		}
+		/*		 
+		 // No gain
+		 else if (envStage == 0) {
+		 env = 0;
+		 //accumulator1 = 0;
+		 //accumulator2 = 0;
+		 //accumulator3 = 0;
+		 }
+		 */		 
+	} else {
+		env = 65535;
+	}
+	
+	// Adding the amplification envelope (16bit) we bring it back to the 16bit frame again afterwards.
+	sample = (env * sample) >> 16;
+	
+	
+	// Formatting the samples to be transfered to the MCP4921 DAC  
+	dacSPI0 = sample >> 8;
+	dacSPI0 >>= 4;
+	dacSPI0 |= 0x30;
+	dacSPI1 = sample >> 4;
+	
+	SPCR |= (1 << MSTR);
+	
+	// transmit value out the SPI port
+	SPDR = dacSPI0;
+	while (!(SPSR & (1<<SPIF)));  // Maybe this can be optimised
+	SPDR = dacSPI1;
+	while (!(SPSR & (1<<SPIF)));  // Maybe this can be optimised
+	
+	// Frame sync high
+#ifdef CFO
+	PORTB |= (1<<2);
+#else
+	PORTD |= (1<<6);
+#endif
+}
+
+
+
+
+/////////////////////////////////////////////////////////
+//
+//	8 BIT WAVETABLE - AUDIO INTERRUPT SERVICE ROUTINE
+//
+/////////////////////////////////////////////////////////
+
+
+void inline MMusic::synthInterrupt8bitFM ()
+{
+	
+	PORTD &= ~(1<<3);
+	
+	// Frame sync low for SPI (making it low here so that we can measure lenght of interrupt with scope)
+#ifdef CFO
+	PORTB &= ~(1<<2);
+#else
+	PORTD &= ~(1<<6);
+#endif
+	
+	accumulator1 = accumulator1 + period1;
+	index1 = accumulator1 >> 8;
+	//oscil1 = 0;
+	memcpy_P(&oscil1, &waveTable[index1 + waveForm1],1);
+	//sample = (oscil1 * gain1);
+	
+	//modulator2 = 0;
+	modulator2 = (fmAmount2 * (oscil1-128) * int32_t(period2))>>14;
+	//modulator2 = (period2 * (oscil1-128))>>7;
+	accumulator2 = accumulator2 + period2 + modulator2;
+	index2 = accumulator2 >> 8;
+	//oscil2 = 0;
+	memcpy_P(&oscil2, &waveTable[index2 + waveForm2],1);
+	sample = (oscil2 * gain2);
+
+	sample >>= 8;
 	
 	
 	// AMPLIFICATION ENVELOPE
@@ -569,6 +697,115 @@ void MMusic::synthInterrupt12bitSine()
 
 
 
+/////////////////////////////////////////////////////////
+//
+//	12 BIT SINEWAVE - AUDIO INTERRUPT SERVICE ROUTINE
+//
+/////////////////////////////////////////////////////////
+
+
+void MMusic::synthInterrupt12bitSineFM()
+{
+	// Frame sync low for SPI (making it low here so that we can measure lenght of interrupt with scope)
+#ifdef CFO
+	PORTB &= ~(1<<2);
+#else
+	PORTD &= ~(1<<6);
+#endif
+	
+	accumulator1 = accumulator1 + period1;
+	index1 = accumulator1 >> 4;
+	memcpy_P(&oscil1, &sineTable[index1],2);
+	//sample = (oscil1 * gain1) << 2; 
+	
+	//modulator2 = 0;
+	modulator2 = (fmAmount2 * int32_t(oscil1-2048))>>2;
+	modulator2 = (modulator2 * int32_t(period2))>>16;
+	accumulator2 = accumulator2 + period2 + modulator2;
+	//accumulator2 = accumulator2 + period2;
+	index2 = accumulator2 >> 4;
+	memcpy_P(&oscil2, &sineTable[index2],2);
+	sample = (oscil2 * gain2); 
+	sample >>= 12;
+	
+	
+	// AMPLIFICATION ENVELOPE
+	// Amplification envelope is calculated here
+	if(envelopeOn) {
+		
+		// Attack
+		if(envStage == 1) {
+			env += attack;
+			if(velPeak < env) {
+				env = velPeak;
+				envStage = 2;
+			}
+		}
+		// Decay
+		else if(envStage == 2) {
+			env -= decay;
+			if(env < velSustain || MAX_ENV_GAIN < env) {
+				env = velSustain;
+				envStage = 3;
+			}
+		}
+		// Sustain
+		else if (envStage == 3) {
+			env = velSustain;
+		}
+		
+		// Release
+		else if (envStage == 4) {
+			env -= release;
+			if(MAX_ENV_GAIN < env) {
+				env = 0;
+				envStage = 0;
+			}
+		}
+		/*		 
+		 // No gain
+		 else if (envStage == 0) {
+		 env = 0;
+		 //accumulator1 = 0;
+		 //accumulator2 = 0;
+		 //accumulator3 = 0;
+		 }
+		 */		 
+	} else {
+		env = 65535;
+	}
+	
+	// Adding the amplification envelope (16bit) we bring it back to the 16bit frame again afterwards.
+	sample = (env * sample) >> 16;
+ 	
+	// Formatting the samples to be transfered to the MCP4921 DAC  
+	dacSPI0 = sample >> 8;
+	dacSPI0 >>= 4;
+	dacSPI0 |= 0x30;
+	dacSPI1 = sample >> 4;
+	
+	SPCR |= (1 << MSTR);
+	
+	// transmit value out the SPI port
+	SPDR = dacSPI0;
+	while (!(SPSR & (1<<SPIF)));  // Maybe this can be optimised
+	SPDR = dacSPI1;
+	while (!(SPSR & (1<<SPIF)));  // Maybe this can be optimised
+	
+	// Frame sync high
+#ifdef CFO
+	PORTB |= (1<<2);
+#else
+	PORTD |= (1<<6);
+#endif
+	// Frame sync high
+	PORTD |= (1<<3);
+	
+}
+
+
+
+
 MMusic Music;
 
 #ifdef MIDI
@@ -644,6 +881,9 @@ void MMusic::init()
 	setSustain(32);
 	setRelease(64);
 	setVelSustain(0);
+	
+	setFM2(0);
+	setFM3(0);
 	
 	//sei(); // global interrupt enable 
 	
@@ -768,6 +1008,21 @@ void MMusic::pitchBend(float b)
 	period1 = uint16_t(((frequency1 * semi1 * (1 + detune1 + bend)) * 65536.0) / SAMPLE_RATE);
 	period2 = uint16_t(((frequency2 * semi2 * (1 + detune2 + bend)) * 65536.0) / SAMPLE_RATE);
 	period3 = uint16_t(((frequency3 * semi3 * (1 + detune3 + bend)) * 65536.0) / SAMPLE_RATE);	
+}
+
+
+void MMusic::setFM1(uint8_t fm) {
+	fmAmount1 = fm;
+}
+
+
+void MMusic::setFM2(uint8_t fm) {
+	fmAmount2 = fm;
+}
+
+
+void MMusic::setFM3(uint8_t fm) {
+	fmAmount3 = fm;
 }
 
 
@@ -1136,13 +1391,17 @@ void MMidi::controller(uint8_t channel, uint8_t number, uint8_t value) {
 			Music.setFrequency3(Music.getNoteFrequency(value));
 			break;
 		case DETUNE1:
-			Music.setDetune1(value/5120.0);
+			Music.setDetune1(map(value,0,127,-100,100)*0.0005946);
 			break;
 		case DETUNE2:
-			Music.setDetune2(value/5120.0);
+			Music.setDetune2(map(value,0,127,-100,100)*0.0005946);
+			//Music.setDetune2((value-64.0)*0.0005946);
+			//Music.setDetune2(value/5120.0);
 			break;
 		case DETUNE3:
-			Music.setDetune3(value/5120.0);
+			Music.setDetune3(map(value,0,127,-100,100)*0.0005946);							 
+			//Music.setDetune3((value-64.0)*0.0005946);
+			//Music.setDetune3(value/5120.0);
 			break;
 		case SEMITONE1:
 			if(15 < value && value < 113) {
