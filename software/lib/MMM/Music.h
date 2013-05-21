@@ -101,18 +101,21 @@
 #define DETUNE1 12
 #define GAIN1 13
 #define WAVEFORM1 14
+#define FM1 15
 
 #define FREQUENCY2 20
 #define SEMITONE2 21
 #define DETUNE2 22
 #define GAIN2 23
 #define WAVEFORM2 24
+#define FM2 25
 
 #define FREQUENCY3 30
 #define SEMITONE3 31
 #define DETUNE3 32
 #define GAIN3 33
 #define WAVEFORM3 34
+#define FM3 35
 
 #define ENV_ATTACK 114
 #define ENV_DECAY 115
@@ -239,12 +242,12 @@ private:
 	uint32_t oscil1;
 	uint32_t oscil2;
 	uint32_t oscil3;
-	int32_t modulator1;
+	int32_t modulator1;  // NOT USED
 	int32_t modulator2;
-	int32_t modulator3;
-	int8_t fmAmount1;
+	int32_t modulator3;  // NOT USED
+	int8_t fmAmount1;  // NOT USED
 	int8_t fmAmount2;
-	int8_t fmAmount3;
+	int8_t fmAmount3;  // NOT USED
 	uint16_t gain;
 	uint16_t gain1;
 	uint16_t gain2;
@@ -883,7 +886,6 @@ void MMusic::init()
 	setVelSustain(0);
 	
 	setFM2(0);
-	setFM3(0);
 	
 	//sei(); // global interrupt enable 
 	
@@ -1453,6 +1455,9 @@ void MMidi::controller(uint8_t channel, uint8_t number, uint8_t value) {
 			break;
 		case WAVEFORM3:
 			Music.setWaveform3(value / 8);
+			break;
+		case FM2:
+			Music.setFM2(value);
 			break;
 		case ENV_ATTACK:
 			Music.setAttack(value);
