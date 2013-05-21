@@ -12,19 +12,26 @@
 // If you copy a function from here to your arduino sketch, just change the word "float", "uint8_t", etc into the
 // variable name that you uses in your sketch.
 
-// PREPROCESSING COMMANDS
+// PRE-PROCESSING COMMANDS
 #define NUM_OSCILLATORS 3  // define the use of 1, 2 or 3 oscillators
 #define BIT_DEPTH 12       // define the bit depth resolution of 8 or 12 bit waveforms
 #define MIDI               // tell the system you will be using the MIDI part of the sound engine
-#define MIDI_CHANNEL       // set the MIDI channel to listen to. Between 1 and 16
+#define MIDI_CHANNEL 1     // set the MIDI channel to listen to. Between 1 and 16
+#define FM                 // tell the library to use the FM synthesis mode
+
+#include <Music.h>
 
 // INITIALIZERS
-// Use this to start the synth engine. It defaults to a sine tone at 110Hz, no envelope and no detune.
+// Use this in the setup() function to start the synth engine.
+// It defaults to a sine tone at 110Hz, no envelope and no detune.
 Music.init();
 
-// Use this to start the MIDI engine. It defaults to a sine tone at 110Hz, no envelope and no detune.
+// Use this in the setup() function to start the MIDI engine. It sets up the serial communication. 
 Midi.init();
 
+// MIDI FUNCTIONS
+Midi.checkMidi() // put this function in the loop() function in your
+                 // Arduino sketch to check for incoming MIDI activity
 
 // FREQUENCY AND DETUNE FUNCTIONS
 // Use these functions to set the frequency and detune parameters of the synth.
@@ -39,6 +46,7 @@ Music.setDetune3(float);     //
 Music.setSemitone1(int8_t);  // Set the semitone offset of base frequency in musical halftones relative to base frequency
 Music.setSemitone2(int8_t);  // Goes from -24 halftones to +24 halftones
 Music.setSemitone3(int8_t);
+Music.setFM2(uint8_t);       // Set the amount of frequency modulation (FM) on oscillator2.
 
 
 // WAVEFORM FUNCTIONS
@@ -116,7 +124,3 @@ Music.setDecay(uint8_t); // 0 - 127
 Music.setSustain(uint8_t); // 0 - 127
 Music.setRelease(uint8_t); // 0 - 127
 
-
-// MIDI FUNCTIONS
-Midi.checkMidi() // put this function in the loop() function in your
-                 // Arduino sketch to check for incoming MIDI activity
