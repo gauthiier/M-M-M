@@ -1,11 +1,7 @@
 //FM synthes of a sort
-<<<<<<< HEAD:software/lib/MMM/examples/Motion/_8_FM/_8_FM.ino
-//hang on! (it's unstable and wants to limit cycle)
-=======
 //hang on!  it's unstable and wants to limit cycle
 
 #define BIT_DEPTH 8 // gives us 16 Waveforms
->>>>>>> getting FM:software/apps/Modeling/FM/FM.ino
 
 #include <Music.h>
 
