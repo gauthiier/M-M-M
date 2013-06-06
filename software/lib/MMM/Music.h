@@ -1268,6 +1268,7 @@ void MMidi::init()
 
 void MMidi::checkMidi()
 {
+	//while(Serial.available() > 32) Serial.read();
 	while(Serial.available() > 0) {
 		
 		data = Serial.read();
@@ -1283,6 +1284,7 @@ void MMidi::checkMidi()
 			midiBuffer[midiBufferIndex] = data;
 			midiBufferIndex++;
 			if (midiBufferIndex > 2) {
+				midiRead = false;
 				midiHandler();
 			}
 		}
@@ -1472,6 +1474,7 @@ void MMidi::controller(uint8_t channel, uint8_t number, uint8_t value) {
 			Music.setRelease(value);
 			break;
 		default:
+			//Music.setFM2(value);
 			break;
 	} 
 }

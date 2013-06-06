@@ -32,22 +32,24 @@ void sendNoteOn(byte channel, byte pitch, byte velocity) {
 
   byte noteOn = byte(0x90 | channel);
 
+  serialBusy = true;  
   port0.write(noteOn);
   port0.write(pitch);
   port0.write(velocity);
   //println('\n' + hex(noteOn) + " " + hex(pitch) + " " + hex(velocity));
-
+  serialBusy = false;
 }
 
 void sendNoteOff(byte channel, byte pitch, byte velocity) {
 
   byte noteOff = byte(0x80 | channel);  
 
+  serialBusy = true;
   port0.write(noteOff);
   port0.write(pitch);
   port0.write(velocity);
   //println('\n' + hex(noteOff) + " " + hex(pitch) + " " + hex(velocity));
-
+  serialBusy = false;
 }
 
 void sendControlChange(byte channel, byte CC, byte value) {
@@ -58,9 +60,11 @@ void sendControlChange(byte channel, byte CC, byte value) {
     
     byte controlChange = byte(0xB0 | channel);
     
+    serialBusy = true;
     port0.write(controlChange);
     port0.write(CC);
     port0.write(value);
+    serialBusy = false;
     //println('\n' + hex(controlChange) + " " + hex(CC) + " " + hex(value));
   } 
 }

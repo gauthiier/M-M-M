@@ -9,18 +9,10 @@ MidiInput input;
 Serial port0;
 
 boolean printChange = true;
+boolean serialBusy;
 
 int backgroundColor = color(0,0,0);
 int knobColor = color(235,103,295);
-
-int numKnobs = 19;
-int[] knobValue = new int[numKnobs];
-
-int posX = 20;
-int posY = 40;
-int posW = 60;
-int posH = 60;
-int knobS = 40;
 
 long time = 0;
 long lastTime = 0;
@@ -48,7 +40,7 @@ void setup() {
 
 void draw() {
   background(backgroundColor);
-  writeKnobValues();
+  //writeKnobValues();
 }
 
 
