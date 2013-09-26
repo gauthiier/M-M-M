@@ -1,12 +1,3 @@
-// You can set the number of oscillators (1 to 3) and the bit depth of the
-// oscillators (8 or 12 bit). These settings must be defined before the
-// inclusion of the MMM library files. They default to 1 osciallator
-// and 8bit respectively.
-
-#define NUM_OSCILLATORS 3
-#define BIT_DEPTH 8
-#define MIDI
-
 // The Music object is automatically instantiated when the header file is
 // included. Make calls to the Music objects with "Music.function(args)".
 // You still need to call Music.init() in the setup() function below.
@@ -15,6 +6,10 @@
 #define MIDI
 #define MIDI_CHANNEL 1
 #include <Music.h>
+
+long timeNow = 0;
+long lastTime = 0;
+long delayTime = 400; //in milliseconds
 
 void setup() {
 
@@ -27,8 +22,15 @@ void setup() {
 
 void loop() {
   
-  // In order to send MIDI to the sketch, use the Music_Controls.pde Processing sketch
+  // In order to send MIDI to the sketch, use the Music_Controls_4.pde Processing sketch
   Midi.checkMidi();
   
+  // The below code is an example of triggering the noteOn function to play some sounds
+  timeNow = millis();
+  if((timeNow - lastTime) > delayTime) {
+    Music.noteOn(64);
+    lastTime = timeNow;  
+    
+  }  
 }
 

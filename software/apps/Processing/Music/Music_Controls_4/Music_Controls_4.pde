@@ -9,7 +9,7 @@ MidiInput input;
 Serial port0;
 
 boolean printChange = true;
-boolean serialBusy;
+boolean serialBusy = false;
 
 int backgroundColor = color(0,0,0);
 int knobColor = color(235,103,295);
@@ -34,7 +34,7 @@ void setup() {
   input = RWMidi.getInputDevices()[0].createInput(this);
   
   //println(Serial.list());
-  port0 = new Serial(this, Serial.list()[0], 9600);
+  port0 = new Serial(this, Serial.list()[12], 9600);
 }
 
 

@@ -206,7 +206,7 @@ void freq1(int val)
     knobValue[knob] = val;
     if(printChange) println(knobName[knob] + " is: " + (int)(pow(2,(knobValue[knob]-69)/12.0)*440) + " Hz");
     //(2^((p-69)/12))*440
-    if(!serialBusy) sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
+    sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
   }
 }
 
@@ -217,7 +217,7 @@ void semi1(int val)
     knobValue[knob] = val;
     if(printChange) println(knobName[knob] + " is: " + knobValue[knob]);
     int semi =(knobValue[knob]+24)*2+16;
-    if(!serialBusy) sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)semi);
+    sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)semi);
   }
 }
 
@@ -227,7 +227,7 @@ void detune1(int val)
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
     if(printChange) println(knobName[knob] + " is: " + knobValue[knob]);
-    if(!serialBusy) sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
+    sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
   }
 }
 
@@ -237,7 +237,7 @@ void gain1(int val)
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
     if(printChange) println(knobName[knob] + " is: " + knobValue[knob]);
-    if(!serialBusy) sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
+    sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
   }
 }
 
@@ -247,7 +247,7 @@ void wave1(int val)
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
     if(printChange) println(knobName[knob] + " is: " + knobValue[knob] + " (" + waveform[knobValue[knob]] + ")");
-    if(!serialBusy) sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)(knobValue[knob]*8));
+    sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)(knobValue[knob]*8));
   }
 }
 
@@ -257,7 +257,7 @@ void fm1(int val)
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
     if(printChange) println(knobName[knob] + " is: " + knobValue[knob]);
-    if(!serialBusy) sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
+    sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
   }
 }
 
@@ -268,7 +268,7 @@ void freq2(int val)
     knobValue[knob] = val;
     if(printChange) println(knobName[knob] + " is: " + (int)(pow(2,(knobValue[knob]-69)/12.0)*440) + " Hz");
     //(2^((p-69)/12))*440
-    if(!serialBusy) sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
+    sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
   }
 }
 
@@ -279,7 +279,7 @@ void semi2(int val)
     knobValue[knob] = val;
     if(printChange) println(knobName[knob] + " is: " + knobValue[knob]);
     int semi =(knobValue[knob]+24)*2+16;
-    if(!serialBusy) sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)semi);
+    sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)semi);
   }
 }
 
@@ -289,7 +289,7 @@ void detune2(int val)
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
     if(printChange) println(knobName[knob] + " is: " + knobValue[knob]);
-    if(!serialBusy) sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
+    sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
   }
 }
 
@@ -299,7 +299,7 @@ void gain2(int val)
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
     if(printChange) println(knobName[knob] + " is: " + knobValue[knob]);
-    if(!serialBusy) sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
+    sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
   }
 }
 
@@ -309,7 +309,7 @@ void wave2(int val)
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
     if(printChange) println(knobName[knob] + " is: " + knobValue[knob] + " (" + waveform[knobValue[knob]] + ")");
-    if(!serialBusy) sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)(knobValue[knob]*8));
+    sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)(knobValue[knob]*8));
   }
 }
 
@@ -319,7 +319,7 @@ void fm2(int val)
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
     if(printChange) println(knobName[knob] + " is: " + knobValue[knob]);
-    if(!serialBusy) sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
+    sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
   }
 }
 
@@ -329,7 +329,7 @@ void freq3(int val)
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
     if(printChange) println(knobName[knob] + " is: " + (int)(pow(2,(knobValue[knob]-69)/12.0)*440) + " Hz");
-    if(!serialBusy) sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
+    sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
   }
 }
 
@@ -340,7 +340,7 @@ void semi3(int val)
     knobValue[knob] = val;
     if(printChange) println(knobName[knob] + " is: " + knobValue[knob]);
     int semi =(knobValue[knob]+24)*2+16;
-    if(!serialBusy) sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)semi);
+    sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)semi);
   }
 }
 
@@ -350,7 +350,7 @@ void detune3(int val)
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
     if(printChange) println(knobName[knob] + " is: " + knobValue[knob]);
-    if(!serialBusy) sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
+    sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
   }
 }
 
@@ -360,7 +360,7 @@ void gain3(int val)
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
     if(printChange) println(knobName[knob] + " is: " + knobValue[knob]);
-    if(!serialBusy) sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
+    sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
   }
 }
 
@@ -370,7 +370,7 @@ void wave3(int val)
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
     if(printChange) println(knobName[knob] + " is: " + knobValue[knob] + " (" + waveform[knobValue[knob]] + ")");
-    if(!serialBusy) sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)(knobValue[knob]*8));
+    sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)(knobValue[knob]*8));
   }
 }
 
@@ -380,7 +380,7 @@ void fm3(int val)
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
     if(printChange) println(knobName[knob] + " is: " + knobValue[knob]);
-    if(!serialBusy) sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
+    sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
   }
 }
 
@@ -390,7 +390,7 @@ void attack(int val)
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
     if(printChange) println(knobName[knob] + " is: " + knobValue[knob]);
-    if(!serialBusy) sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
+    sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
   }
 }
 
@@ -400,7 +400,7 @@ void decay(int val)
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
     if(printChange) println(knobName[knob] + " is: " + knobValue[knob]);
-    if(!serialBusy) sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
+    sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
   }
 }
 
@@ -410,7 +410,7 @@ void sustain(int val)
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
     if(printChange) println(knobName[knob] + " is: " + knobValue[knob]);
-    if(!serialBusy) sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
+    sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
   }
 }
 
@@ -420,7 +420,7 @@ void release(int val)
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
     if(printChange) println(knobName[knob] + " is: " + knobValue[knob]);
-    if(!serialBusy) sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
+    sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
   }
 }
 
