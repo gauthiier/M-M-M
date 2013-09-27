@@ -33,8 +33,8 @@ void setup() {
   //println(RWMidi.getInputDeviceNames());
   input = RWMidi.getInputDevices()[0].createInput(this);
   
-  //println(Serial.list());
-  port0 = new Serial(this, Serial.list()[12], 9600);
+  println(Serial.list());
+  port0 = new Serial(this, Serial.list()[0], 9600);
 }
 
 

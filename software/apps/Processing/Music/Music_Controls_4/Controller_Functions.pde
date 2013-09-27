@@ -226,7 +226,7 @@ void detune1(int val)
   int knob = 2;
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
-    if(printChange) println(knobName[knob] + " is: " + knobValue[knob]);
+    if(printChange) println(knobName[knob] + " is: " + map(knobValue[knob],0,127,-100,100)*0.0005946);
     sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
   }
 }
@@ -236,7 +236,7 @@ void gain1(int val)
   int knob = 3;
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
-    if(printChange) println(knobName[knob] + " is: " + knobValue[knob]);
+    if(printChange) println(knobName[knob] + " is: " + knobValue[knob]/127.0);
     sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
   }
 }
@@ -288,7 +288,7 @@ void detune2(int val)
   int knob = 8;
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
-    if(printChange) println(knobName[knob] + " is: " + knobValue[knob]);
+    if(printChange) println(knobName[knob] + " is: " + map(knobValue[knob],0,127,-100,100)*0.0005946);
     sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
   }
 }
@@ -298,7 +298,7 @@ void gain2(int val)
   int knob = 9;
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
-    if(printChange) println(knobName[knob] + " is: " + knobValue[knob]);
+    if(printChange) println(knobName[knob] + " is: " + knobValue[knob]/127.0);
     sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
   }
 }
@@ -349,7 +349,7 @@ void detune3(int val)
   int knob = 14;
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
-    if(printChange) println(knobName[knob] + " is: " + knobValue[knob]);
+    if(printChange) println(knobName[knob] + " is: " + map(knobValue[knob],0,127,-100,100)*0.0005946);
     sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
   }
 }
@@ -359,7 +359,7 @@ void gain3(int val)
   int knob = 15;
   if(knobValue[knob] != val) {
     knobValue[knob] = val;
-    if(printChange) println(knobName[knob] + " is: " + knobValue[knob]);
+    if(printChange) println(knobName[knob] + " is: " + knobValue[knob]/127.0);
     sendControlChange((byte)0, (byte)knobMidiCC[knob], (byte)knobValue[knob]);
   }
 }
